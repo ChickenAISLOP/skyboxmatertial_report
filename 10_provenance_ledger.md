@@ -4,7 +4,42 @@
 single largest error in this investigation was an *inference* presented with the same
 confidence as a measurement. Recording which claims rest on what, makes that visible.
 
-## Tiers
+## Every crash in this investigation was mine
+
+Five, all self-inflicted, all from the same family of mistake — calling something whose
+argument convention had not been established.
+
+| # | Cause | `pcall` catchable? |
+|---|---|---|
+| 1 | `get_variable("string")` where an `Idstring` was required | **no** — access violation |
+| 2 | Invented a `SizeCode` symbol that does not exist | **no** — access violation |
+| 3 | `local a = 1, b = 2` (invalid declaration) | yes |
+| 4 | `DelayManager` — a global that does not exist in this build | yes |
+| 5 | `set_override_environment(path, blend)` — guessed argument count | **no** — access violation |
+
+**Crash 5 in detail.** `coreviewportmanager.lua` lists
+`set_override_environment(environment_path, blend_duration, ...)` — with more arguments
+after `blend_duration`. Rev3 tried `(path, blend)` first. That faulted inside
+`PackageManager:_script_data`, reached through BeardLib's `FileManager:Process:46`.
+
+Two contributing factors:
+
+1. **The argument count was guessed.** No installed mod calls
+   `set_override_environment` — zero hits across 1,419 mod Lua files. Passing fewer
+   arguments than the native function reads leaves it reading memory never supplied.
+2. **BeardLib is in the load path.** `FileManager.lua:23` assigns `FileManager = self`,
+   so every environment load goes through BeardLib's `Process`.
+
+This is the same error as crash 2. The rule "only call functions another installed mod
+already calls successfully" exists precisely to prevent it — it is written above in this
+same file — and it was bypassed anyway because the decompiled signature *looked* safe.
+
+`set_override_environment` was removed. It is the better API on paper (it takes a blend
+duration, which `_set_environment` does not) but is not safely callable without precedent.
+`worlddefinition:_set_environment(path)` is used instead: it was called in rev1 without
+raising and without crashing, and it is what the Day & Night mod calls.
+
+## Provenance tiers
 
 | Tier | Meaning |
 |---|---|
@@ -71,12 +106,17 @@ Dome visibly rotated and returned (user-confirmed video).
    This mistake was made twice on two different objects.
 3. **Only call functions another installed mod already calls successfully.** `pcall`
    cannot catch access violations. Precedent: `DisableFog` for `get_value`,
-   BeardLib-Editor for `editor_set_value`.
+   BeardLib-Editor for `editor_set_value`. **This rule was bypassed on
+   `set_override_environment` and caused crash 5.** Zero hits across 1,419 mod Lua files
+   is the signal to leave it alone.
 4. **Do not trust a Lua global because it sounds right.** `DelayManager` does not exist
-   in this build; `DelayedCalls` does. This one crashed the game.
-5. **Every crash so far was mine.** Three earlier (a string passed where an `Idstring`
-   was required, an invented `SizeCode` symbol, invalid `local a = 1, b = 2`) plus the
-   `DelayManager` one. All validated with real LuaJIT via `lupa` afterwards.
+   in this build; `DelayedCalls` does.
+5. **A decompiled signature is not a calling convention.** The constant pool shows
+   `set_override_environment(environment_path, blend_duration, ...)` — it does not show
+   how many arguments the native function reads. Reading one as the other caused crash 5,
+   the same failure mode as the invented `SizeCode` symbol in crash 2.
+6. **A crash should close the door, not invite a retry with different arguments.**
+   Crashes 1, 2 and 5 were all followed by a narrower attempt at the same thing.
 
 ## Corrections issued this session
 
