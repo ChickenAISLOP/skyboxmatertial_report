@@ -85,8 +85,28 @@ if (Test-Path $EnvCsv) {
 # scan
 # ---------------------------------------------------------------------------
 $roots = @($Path)
-foreach ($p in $roots) {
-    if (-not (Test-Path $p)) { throw "path not found: $p" }
+
+# Fail with something actionable rather than "path not found".
+$missing = @($roots | Where-Object { -not (Test-Path $_) })
+if ($missing.Count -gt 0) {
+    foreach ($m in $missing) { Write-Warning "path not found, skipped: $m" }
+    $roots = @($roots | Where-Object { Test-Path $_ })
+    if ($roots.Count -eq 0) {
+        throw @"
+No usable export root.
+  tried: $($Path -join ', ')
+Pass -Path with a folder that contains *.material_config files, for example:
+  & '$ScriptDir\regenerate_sky_inventory.ps1' -Path 'D:\pd2_units_export'
+"@
+    }
+}
+
+# If a sibling units export is present but was not passed explicitly, pick it up
+# automatically. Saves having to remember the argument.
+$auto = Join-Path $RepoRoot 'units'
+if ((Test-Path $auto) -and ($roots -notcontains $auto)) {
+    Write-Status "auto-including units export: $auto"
+    $roots += $auto
 }
 
 $configs = foreach ($p in $roots) {
