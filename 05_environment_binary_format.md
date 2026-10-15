@@ -47,8 +47,8 @@ Then, in order:
 float pool          floatPoolCount × float32
 string records      stringCount × { u32 offset; u32 pad[3] }     at recordTable + 8
 string bytes        NUL-separated ASCII
-node/value block    variable length  (from 0x058 to the tag stream)
-tag stream          [u8 tag][u8 value][0x00][0x00] × N
+node/value block    variable length, contains a 40-byte descriptor table
+record grid         [u8 tag][u8 value][0x00][0x00] × N
 ```
 
 The 8-byte gap at `recordTable + 8` is real: the first 8 bytes after the header
@@ -157,7 +157,7 @@ certainly flare scale or sun-range parameters.
 
 ---
 
-## Tag stream — fully decoded
+## Record grid — fully decoded
 
 4-byte words, `[u8 tag][u8 value][0x00][0x00]`. Only five tag values occur.
 
@@ -170,7 +170,8 @@ certainly flare scale or sun-range parameters.
 | `0x08` | string reference, element or container name |
 
 Locating it: scan for the longest run of words where bytes 2 and 3 are both zero and
-bytes 0 and 1 are both `< 0x40`. Reliable on every file.
+bytes 0 and 1 are both `< 0x40`. Reliable on every file. **Derive this offset — do not
+hard-code it**, see the caveat under *The descriptor table*.
 
 ### Document structure
 
@@ -221,9 +222,9 @@ coincidence.
 
 ---
 
-## Node/value block — not decoded
+## Node/value block — partially decoded
 
-Runs from `0x058` to the start of the tag stream.
+Runs from `0x058` to the start of the record grid.
 
 | Tier | Block size |
 |---|---|
@@ -231,27 +232,61 @@ Runs from `0x058` to the start of the tag stream.
 | 2 | 5,311 – 5,359 bytes |
 | 3 | 6,595 – 7,259 bytes |
 
-What is known:
+### What is known
 
 - It is **variable length per record**, not a flat array. Two files with identical key
   sets have non-identical block layouts.
 - It mixes **float32 and integer** fields at the same alignment. Reading it as pure
   float32 produces denormal garbage from roughly the midpoint onward
-  (`5.6E-45` = the integer `4`).
-- Colour values appear as clean **RGB float triples**. A Tier-1 file opens with three
-  such triples:
+  (`5.6E-45` is the integer `4` at float32 scale).
+- Colour values appear as clean **RGB float triples**. A Tier-1 file opens with them:
   ```
   0.2745 0.5294 0.6000
   0.2941 0.3098 0.3490
   0.3137 0.4314 0.4510
   ```
-  These map to the five colour params an environment carries — `fog_start_color`,
-  `fog_far_low_color`, `ambient_color`, `sky_top_color`, `sky_bottom_color`.
-- Distance/range parameters live here too. The same file yields `533`, `2367`,
+  and closes with two more. Five in total, matching the five colour params an
+  environment carries — `fog_start_color`, `fog_far_low_color`, `ambient_color`,
+  `sky_top_color`, `sky_bottom_color`.
+- Distance and range parameters live here too. The same file yields `533`, `2367`,
   `10000`, `9999`, `50000`, `101`, `801`, `634`, `1566` — fog ranges and cascaded
   shadow slice depths.
 
-What is not known: the per-record layout, so which value belongs to which key.
+### The descriptor table
+
+Buried in the middle of the block is a table of **40-byte descriptors**, each holding
+three small integers and one u32 pointer into the record region.
+
+Stride is **40 bytes**, and that is consistent across every file measured:
+
+| File | Tier | Pointers | Spacing |
+|---|---|---|---|
+| `pd2_indiana_basement` | 1 | 41 | 40 × 39, 80 × 1 |
+| `pd2_are_stage` | 1 | 41 | 40 × 39, 80 × 1 |
+| `pd2_env_night` | 1 | 43 | 40 × 39, 80 × 3 |
+| `pd2_hox_1` | 3 | 165 | 40 × 163, 160 × 1 |
+| `env_menu` | 3 | 161 | 40 × 158, 80 × 1, 120 × 1 |
+
+Pointer targets, relative to the record grid, for `pd2_indiana_basement`:
+
+```
+13, 45, 109, 125, 141, 181, 197, 213, 229, 245, 277, 293, ...
+```
+
+Deltas: `32, 64, 16, 16, 40, 16, 16, 16, 16, 32, 16` — every one a multiple of 8. All
+targets are `≡ 1 (mod 4)` relative to the grid, so they land 13 bytes into the record
+stream rather than on a record boundary.
+
+> **Caveat that cost an hour:** pointer detection depends on where you declare the
+> record region to begin. Hard-coding `0xdc8` instead of deriving it from the longest
+> `[tag][val][0][0]` run makes descriptor spacing look like 32 bytes and shifts which
+> u32 values qualify as pointers. Derive the grid first; do not hard-code it.
+
+### What is still unknown
+
+The meaning of each descriptor field, and therefore which value belongs to which key.
+The 40-byte stride and the 16-byte pointer granularity are solid; the semantics are
+not.
 
 ### Why this was not pushed further
 

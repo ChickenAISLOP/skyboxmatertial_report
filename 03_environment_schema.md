@@ -450,8 +450,9 @@ constants.
 
 **Not recovered:** per-key attribution of the numeric values inside the node/value
 block. That block is variable-length per record and mixes float32 with integer fields.
-The block also carries the distance-type parameters (fog ranges, cascaded shadow slice
-depths), which are not in the float pool.
+A 40-byte descriptor table inside it has been mapped, but its field semantics are not
+resolved. The block also carries the distance-type parameters (fog ranges, cascaded
+shadow slice depths), which are not in the float pool.
 
 For exact numbers on those, read them live in-game — the Environment Editor mod
 already surfaces several, and `coresky` exposes `interpolate` and `database_lookup`.

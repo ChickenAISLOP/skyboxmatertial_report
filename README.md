@@ -150,8 +150,8 @@ Diesel Crate Browser export of
 | Environment key sets | 225 / 225 |
 | `underlay` sky binding | 223 / 225 (the 2 exceptions are the 2 Tier-2 files) |
 | Literal float constants | 2,210 slots, 575 distinct |
-| Environment node/value block | **Not decoded** — variable-length records, see `05` |
+| Environment node/value block | **Partially decoded** — 40-byte descriptor table mapped, field semantics unknown, see `05` |
 
-Everything except the node/value block is verified directly from the export. The one
-remaining gap is per-key numeric attribution inside that block, which is cheaper to
-get in-game via the Environment Editor mod than by further binary work.
+Everything except the node/value block's field semantics is verified directly from the
+export. The remaining gap is per-key numeric attribution inside that block, which is
+cheaper to get in-game via the Environment Editor mod than by further binary work.
