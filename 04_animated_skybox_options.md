@@ -28,7 +28,9 @@ Sun/flare animation ships as part of the **modern rendering pipeline**, not as a
 separate animation feature. It is therefore absent from ~78% of environments — there is
 no sun model there to animate.
 
-**Dome rotation is the only animation channel that works in 100% of environments.**
+**Dome rotation is the only animation channel that works in 100% of environments — and
+it is the only one confirmed drivable from Lua at runtime.** All five rows above are
+reachable from a mod; rotation is the cheapest and the most universal.
 
 ---
 
@@ -52,9 +54,32 @@ because it only looked at the dome.
 
 ---
 
-## Option A — Dome rotation — **NOT POSSIBLE FROM A MOD**
+## Option A — Dome rotation — **AVAILABLE AND VERIFIED**
 
 `sky_orientation.rotation` exists in **all 225 environments**.
+
+> **CORRECTION. This option was previously marked "NOT POSSIBLE FROM A MOD". That was
+> wrong.** The original closure note is preserved below. The conclusion was drawn from
+> probing the sky *material*, which has no rotation variable — a true observation that
+> was over-generalised to the whole engine. Rotation lives on the environment handler,
+> and it is writable.
+
+**Working recipe, verified in-game:**
+
+```lua
+local key = Idstring("sky_orientation/rotation"):key()   -- "3c084f67b1da34be"
+local h = managers.viewport:first_active_viewport()._env_handler
+
+h:editor_set_value(key, degrees)   -- write
+h:get_value(key)                   -- read
+```
+
+Measured on heist `big`: `338` → write `68` → read back `68` → restore `338`, with the
+dome visibly rotating and returning. `managers.viewport:has_data_path_key(key)` = `YES`.
+See `08` for the full retraction.
+
+<details>
+<summary>Original (retracted) closure note</summary>
 
 > **This option is closed.** A live in-game probe found no Lua-facing setter.
 > `SkyRotationFeeder` is C++-internal and consumes the key directly from the
@@ -66,23 +91,26 @@ because it only looked at the dome.
 > achievable mod. Retained because the reasoning still explains *why* the other
 > options exist.
 
+</details>
+
 Skybox rotation is a display concern, not an art concern. A slowly rotating dome
 reads as a moving sky even with zero texture animation. This is what most "animated
 skybox" mods assume.
 
-**Pros** (if it were reachable)
+**Pros**
 - Available in every environment, no exceptions
 - One value, trivial to drive
 - No new assets, no new textures, no disk cost
 - Cannot seam or tile — it is a matrix, not a UV offset
 - Zero framerate cost
+- **Verified drivable from Lua**
 
 **Cons**
 - Clouds baked into the cubemap rotate with it. For a single-composite sky that is
   often unnoticeable; for `sky_1945_sunset_clouds` (layered) the clouds would
-  counter-rotate and look wrong.
+  counter-rotate and look wrong. Option B is the fix for that case.
 
-**Effort:** low. **Recommendation: do this first.**
+**Effort:** low. **Recommendation: do this first** — it is now the cheapest confirmed win.
 
 ---
 
@@ -228,8 +256,10 @@ Option C is a cheap add-on to A for outdoor levels.
 
 ## Practical next steps
 
-1. **Prove rotation.** Drive `sky_orientation.rotation` per-frame in-game. If that
-   looks acceptable, ship it. Everything else is optional.
+1. ~~**Prove rotation.** Drive `sky_orientation.rotation` per-frame in-game. If that
+   looks acceptable, ship it. Everything else is optional.~~
+   **Done.** Rotation is proven writable; `338 → 68 → 338` with the dome visibly
+   rotating. Ship this first. Everything else is optional.
 2. **Confirm the template token.** Apply a config with `DIFFUSE0_UVANIM` + `uv0_speed`
    to `mat_rail_adapter` (the weapon from Scrolling Textures) to confirm the shader
    path, then try the same on a sky material. Isolates config syntax from scene

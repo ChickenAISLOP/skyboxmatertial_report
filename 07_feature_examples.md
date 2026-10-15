@@ -13,7 +13,7 @@ filter — see *Corrections* at the end.
 
 # The four animatable features
 
-## 1. Dome rotation — key only
+## 1. Dome rotation — key only, **and drivable**
 
 ```
 sky_orientation
@@ -24,11 +24,17 @@ sky_orientation
 
 - **Where:** inside every one of the 225 `.environment` files
 - **Coverage:** 225 / 225
-- **Runtime:** `Global.level_data` → environment → `sky_orientation`
-- **Status:** key decoded, value in the node/value block
+- **Data path key:** `Idstring("sky_orientation/rotation"):key()` = `3c084f67b1da34be`
+- **Runtime write:** `managers.viewport:first_active_viewport()._env_handler:editor_set_value(key, degrees)`
+- **Runtime read:** same handler, `:get_value(key)`
+- **Status:** key decoded, value in the node/value block, **runtime write verified in-game**
 
 The only animation channel that works in every environment. `rotation` also appears in
 the 225/225 key set alongside `sky_orientation`, `param`, `key`, `value`.
+
+The data-path hash above is not arbitrary — `managers.worlddefinition._environment_modifier_id`
+reads back as the same string, so the level's own environment modifier is keyed on this
+value. See `08` for the full write/read-back verification.
 
 ---
 

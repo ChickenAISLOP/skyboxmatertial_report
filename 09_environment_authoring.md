@@ -9,20 +9,41 @@ Everything here is from the modding toolchain, not from the binary export.
 
 ## The correction
 
-`08` concluded:
+`08` previously concluded:
 
 > **There is no Lua-facing setter for `sky_orientation/rotation`.** ... The dome
 > cannot be rotated or scrolled from a Lua mod.
 
-The first half is correct and was verified by probe. The second half does not follow.
-Rotation is **authorable in the environment file**, and two further runtime animation
-surfaces exist that the binary export never exposed.
+**Both halves were wrong.** The setter exists and is verified in-game. An earlier
+version of this document tried to salvage the claim by saying the first half was right
+and the second did not follow — that was itself a half-measure and has been replaced.
 
-| Route | Verified how |
-|---|---|
-| `sky_orientation/rotation` as a file parameter | present in all 25 Day & Night XML files and in the BeardLib template |
-| Whole-environment swap at runtime | `managers.worlddefinition:_set_environment()` |
-| Colour grading elements | `EditorEnvironment` in BeardLib-Editor |
+The root cause: the probe enumerated the sky **material**, which genuinely has no
+rotation variable, and reported that as "no Lua-facing setter". Rotation is an
+**environment value** on the viewport's environment handler, one layer up.
+
+| Route | Verified how | Status |
+|---|---|---|
+| `sky_orientation/rotation` at runtime | `_env_handler:editor_set_value` | **Tier 1 — write, read-back and restore confirmed in-game** |
+| `sky_orientation/rotation` as a file parameter | present in all 25 Day & Night XML files and in the BeardLib template | Tier 2 — file re-derivation |
+| Whole-environment swap at runtime | `managers.worlddefinition:_set_environment()` | Tier 2 — callable, candidates verified, **rendered result not yet confirmed** |
+| Colour grading elements | `EditorEnvironment` in BeardLib-Editor | Tier 3 — third-party source |
+
+### Rotation, verified
+
+```lua
+local key = Idstring("sky_orientation/rotation"):key()   -- "3c084f67b1da34be"
+local h = managers.viewport:first_active_viewport()._env_handler
+
+h:editor_set_value(key, degrees)
+h:get_value(key)
+```
+
+Measured on heist `big`: `338` → write `68` → read back `68` → restore `338`. The dome
+visibly rotated and returned. `managers.viewport:has_data_path_key(key)` = `YES`.
+
+This is the simplest animated skybox available: one number, present in all 225
+environments, no assets, no framerate cost.
 
 ---
 
@@ -235,7 +256,7 @@ thing the probe did: rotation exists in the schema but is not a useful lever.
 | Claim | Was | Now |
 |---|---|---|
 | Rotation authorable | not addressed | **yes**, `<param key="rotation">` in the file |
-| Rotation drivable from Lua | no | **no** — probe confirmed |
+| Rotation drivable from Lua | no | **YES — proven in-game.** `_env_handler:editor_set_value`, read/write/restore confirmed |
 | `color1` settable | "unused, not exposed" | **authorable**, `underlay_effect/sky/color1` |
 | `uv_velocity_*` key path | flat leaf name | `underlay_effect/cloud_overlay/uv_velocity_*` |
 | Animation mechanism | four variables on a material | environment swap, plus colour grading elements |

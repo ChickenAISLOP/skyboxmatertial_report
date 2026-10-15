@@ -2,8 +2,15 @@
 
 **Date:** 2026-10-15
 **Subject:** Can a PAYDAY 2 skybox be animated, and what drives it?
-**Short answer:** Yes. Vanilla already does it — but through the **environment** and
-**material config** layers, not the layer the existing mod was patching.
+**Short answer:** Yes, two independent ways. **Dome rotation is directly drivable from
+Lua** (`_env_handler:editor_set_value`), and whole-environment swap re-grades the sky.
+Both act on the **environment** and **material config** layers, not the layer the
+existing mod was patching.
+
+> **Read `10_provenance_ledger.md` if you only read one other file.** An earlier version
+> of this report stated that rotation was unreachable from Lua. That was wrong, it was
+> retracted across five documents, and the ledger records why — it was an inference
+> dressed up as a measurement.
 
 ---
 
@@ -20,6 +27,7 @@
 | `07_feature_examples.md` | **One worked example per feature**, with real values |
 | `08_render_templates_shaders.md` | `dome_sky`/`dome_clouds`/`dome_sun`, shader inputs, runtime probe |
 | `09_environment_authoring.md` | **How the sky is actually animated** — BeardLib, environment XML, the day/night recipe |
+| `10_provenance_ledger.md` | **Which claims rest on what** — the rotation retraction, current tier for every claim, process rules |
 
 ### Artifacts
 
@@ -101,7 +109,8 @@ legacy environments — they have no sun model at all.
 **`env_menu` is Tier 3.** The main menu runs the full stack with an animated sun. That
 is exactly where the mod was costing framerate.
 
-**Dome rotation is the only animation channel present in all 225 environments - but it is not reachable from a Lua mod.** See finding 5 and `09`.
+**Dome rotation is the only animation channel present in all 225 environments — and it
+IS reachable from a Lua mod.** Corrected finding; see finding 5 and `09`.
 
 ---
 
@@ -113,10 +122,34 @@ An in-game read-only probe enumerated every Lua-reachable environment object.
 route is `managers.viewport:first_active_viewport():vp():get_post_processor_effect(...)`.
 
 A filter for `rot` / `sky` / `orient` / `underlay` / `sun` across all reachable methods
-and fields returned **zero hits**. There is no Lua setter for
-`sky_orientation/rotation` - `SkyRotationFeeder` is C++-internal.
+and fields returned **zero hits** — on the **sky material**. That was the wrong layer,
+and an earlier draft of this report wrongly generalised it to the whole engine.
 
-Exactly four variables are writable, via the same path the Environment Editor uses:
+The rotation setter exists. It lives on the viewport's environment handler, one level
+up from the material:
+
+```lua
+local key = Idstring("sky_orientation/rotation"):key()   -- "3c084f67b1da34be"
+local h = managers.viewport:first_active_viewport()._env_handler
+h:editor_set_value(key, degrees)      -- write
+h:get_value(key)                      -- read
+```
+
+Verified in-game on `big`, read → write → read-back → restore:
+
+| Step | Value |
+|---|---|
+| original | `338` |
+| wrote `338 + 90` | `68` |
+| read back 0.5 s later | `68` |
+| restored | `338` |
+
+`managers.viewport:has_data_path_key(key)` returns `YES`, and
+`managers.worlddefinition._environment_modifier_id` is literally `"3c084f67b1da34be"` —
+the same hash — so the level's own environment modifier is keyed on this value.
+
+Exactly four variables are writable on the sky **material**, via the same path the
+Environment Editor uses:
 
 ```lua
 local mat = Underlay:material(Idstring("sky"))
@@ -135,28 +168,51 @@ end
 
 `params_a`/`params_b` match the static decoding exactly, validating the binary analysis.
 
+**Correction.** The material probe was sound; the inference drawn from it was not. Four
+variables on the material is a statement about the *material*, not about the engine.
+`SkyRotationFeeder` is indeed C++-internal, but it is fed from an environment value that
+Lua can address directly.
+
 ---
 
 ## Bottom line
 
-**Yes — but not the way the earlier drafts of this report said.** The sky is animated by
-**replacing the whole environment**, not by moving the dome.
+**Yes — and there are two independent ways to do it, not one.**
+
+### 1. Dome rotation — directly drivable (verified in-game)
+
+`sky_orientation/rotation` is a live, writable environment value. Read it, write it,
+read it back, restore it. The dome visibly rotated and returned. This is the cheapest
+possible animated skybox and it works from Lua in a heist.
+
+```lua
+local key = Idstring("sky_orientation/rotation"):key()
+local h = managers.viewport:first_active_viewport()._env_handler
+h:editor_set_value(key, current_angle + degrees_per_second * dt)
+```
+
+It is present in **225 / 225** environments, so it is not a per-level special case.
+
+### 2. Environment swap — re-grades the whole sky
 
 Four parameters do it: `underlay`, `color0`, `color2`, `sun_ray_color`. A working
 17-variant day/night cycle ships in the `Day & Night Full` mod, driven by
-`managers.worlddefinition:_set_environment()`. The dome never rotates; it is re-graded.
+`managers.worlddefinition:_set_environment()`.
 
 ```lua
 BeardLib:ReplaceScriptData(path, "custom_xml", "environments/morning", "environment", true)
 managers.worlddefinition:_set_environment("environments/morning")
 ```
 
-`BeardLib-Editor` provides a GUI for this. Full schema, key paths and the worked
-recipe are in `09_environment_authoring.md`.
+`_set_environment` is confirmed present and callable. Its candidates are real DB paths
+of the form `environments/<dir>/<name>` — all verified `YES` — but an in-heist swap has
+not yet been confirmed to change the rendered sky; the level's own environment name is
+not readable from Lua, so the revert path could not be captured. Treat swap as
+**authoring-proven, runtime-unproven**. `BeardLib-Editor` gives it a GUI.
 
-Runtime Lua on the material is limited to four variables (`params_a`, `params_b`,
-`color0`, `color2`), and that surface only produces a slow colour wash. Rotation is
-authorable in the file but not drivable from Lua. See `08` and `09`.
+Runtime Lua on the sky *material* remains limited to four variables (`params_a`,
+`params_b`, `color0`, `color2`), and that surface alone only produces a slow colour
+wash. Rotation is a separate surface on the environment handler and is fully open.
 
 ---
 
@@ -210,7 +266,7 @@ Diesel Crate Browser export of
 | Live sky values | Probed in-game: `params_a`/`params_b` match static decoding exactly |
 | Lua-reachable sky controls | **4 variables** — `params_a`, `params_b`, `color0`, `color2` |
 | Environment XML schema | Full schema recovered from BeardLib - see `09` |
-| `sky_orientation/rotation` | **Authorable in file**, not drivable from Lua |
+| `sky_orientation/rotation` | **Drivable from Lua** via `_env_handler:editor_set_value` — corrected |
 | Environment node/value block | **Partially decoded** — 40-byte descriptor table mapped, field semantics unknown, see `05` |
 
 ### Known gap: `units/` was never exported

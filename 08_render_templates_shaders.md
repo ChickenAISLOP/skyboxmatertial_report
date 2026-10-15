@@ -232,7 +232,13 @@ Viewport fields: `__manager`, `__name`, `__active_requested`, `__really_activate
 `_env_handler`, `_vp`, `_vpm`, `_replaced_vp`, `_render_params`, `_init_trace`,
 `_ref_fov_stack`, `_enable_adaptive_quality`, `_width_mul_enabled`.
 
-### `sky_orientation/rotation` is not reachable — closed
+### `sky_orientation/rotation` IS reachable — retracted
+
+> **This section previously read "not reachable — closed". That conclusion was wrong
+> and is retracted.** The original text is preserved below so the error and its cause
+> stay on the record.
+
+The retracted reasoning, in full:
 
 `CoreSky`, `EnvironmentHandler` and `EnvironmentManager` are **not globals** at
 runtime. `viewport._env_handler` exists but is an empty table.
@@ -246,16 +252,60 @@ is real and present in all 225 environments, but not drivable at runtime.
 
 This resolves what `03`, `04` and `07` previously left open.
 
-### Correction
+#### Why that reasoning failed
 
-Those documents described rotation as "the cheapest possible win" and "the only
-animation channel available in all 225 environments". Both are true of the **engine**
-and false for **runtime Lua**. A sky dome cannot be rotated from a Lua mod.
+Two independent errors, either of which alone would have produced the wrong answer.
 
-**Further correction, see `09`.** "Not drivable at runtime" is not the same as "not
-moddable". `sky_orientation/rotation` is authorable in the environment file, and the
-primary sky-animation mechanism is swapping whole environments, not moving the dome.
-This section was too strong. `09` documents the real routes.
+**1. An empty `pairs()` result was read as "no methods".** `viewport._env_handler` is
+metatable-backed, exactly like `managers.worlddefinition`. `pairs()` on the object
+returns nothing because the methods sit on `__index`. The probe concluded the table was
+empty; it had only failed to look at the metatable.
+
+**2. The wrong object was probed.** The sky *material* genuinely has no rotation
+variable — that observation is correct and still stands. But the material is not where
+rotation lives. Rotation is an **environment value**, owned by the environment handler.
+"Four writable variables on the material" was generalised into "no Lua-facing setter",
+which does not follow.
+
+#### What is actually there
+
+```lua
+local key = Idstring("sky_orientation/rotation"):key()   -- "3c084f67b1da34be"
+local h = managers.viewport:first_active_viewport()._env_handler
+
+h:editor_set_value(key, degrees)   -- write
+h:get_value(key)                   -- read
+```
+
+`managers.viewport` also exposes `has_data_path_key`, `get_environment_value`,
+`create_global_environment_modifier`, `destroy_global_environment_modifier` and
+`update_global_environment_value` — the full runtime environment-control surface.
+
+`managers.viewport:has_data_path_key(key)` returns `YES`.
+
+#### Verified in-game
+
+Heist `big`, measured live:
+
+| Step | Value |
+|---|---|
+| `h:get_value(key)` | `338` |
+| `h:editor_set_value(key, 68)` | returned without raising |
+| `h:get_value(key)` 0.5 s later | `68` |
+| `h:editor_set_value(key, 338)` | returned without raising |
+| `h:get_value(key)` | `338` |
+
+The dome **visibly rotated** and returned. Both the numeric round-trip and the visual
+result are confirmed.
+
+Corroboration that this is the real mechanism, not a coincidence:
+`managers.worlddefinition._environment_modifier_id` reads `"3c084f67b1da34be"` — the
+same hash as the rotation data path. The level's own environment modifier is keyed on
+this value. Its live `_environment` table carries `sky_rot`, which was observed moving
+between sessions (53, then 162, then 338), i.e. something already writes to it.
+
+BeardLib-Editor reaches the same call at `Classes/Map/Layers/EnvironmentLayerEditor.lua:653`
+— with the author's own comment `-- I guess this works`. It works.
 
 ### What is actually animatable
 
