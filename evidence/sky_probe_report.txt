@@ -1,0 +1,119 @@
+=== PAYDAY 2 sky probe (rev 4, read-only) ===
+heist           = modders_devmap
+underlay_loaded = true
+
+--- dome_sky material (variable_exists gate + get_variable) ---
+  params_a     Vector3(0.9000, 0.5000, 2.0000)
+  params_b     Vector3(0.1500, 1.0000, 0.0000)
+  color0       Vector3(0.0000, 0.0000, 0.0000)
+  color1       <absent - not set on this sky>
+  color2       Vector3(0.0000, 0.0000, 0.0000)
+
+  color1 verdict: see the line above.
+    absent -> the shader input is real but unset; set_variable would
+                likely be accepted and is worth a controlled test.
+    a value -> already populated at runtime, read it and compare with
+               the static config (static says every sky ships 1 1 1).
+
+--- keys the Environment Editor also uses (sanity check) ---
+  color0_scale             <absent>
+  color2_scale             <absent>
+  ambient_color            <absent>
+  ambient_falloff_scale    <absent>
+  fog_start_color          <absent>
+  fog_far_low_color        <absent>
+  fog_min_range            <absent>
+  fog_max_range            <absent>
+  fog_max_density          <absent>
+
+--- environment globals (rev2 found all of these absent) ---
+  CoreSky                    <absent>
+  EnvironmentHandler         <absent>
+  EnvironmentManager         <absent>
+  managers.environment       <absent>
+  -> none of them are globals. The live route is via the viewport.
+
+  viewport                   type=table
+                             fields: __active_requested, __manager, __name, __really_activated, _enable_adaptive_quality, _env_handler, _init_trace, _ref_fov_stack, _render_params, _replaced_vp, _vp, _vpm, _width_mul_enabled
+  vp                         type=userdata
+  post_processor             type=userdata
+  modifier(apply_ambient)    type=userdata
+  env material               type=userdata
+
+--- methods on vp (names only, nothing invoked) ---
+  vp  (type=userdata):
+    __eq
+    __gc
+    __tostring
+    alive
+    camera
+    director
+    extension
+    get_post_processor_effect
+    get_post_processor_effect_name
+    get_rect
+    key
+    override_submit_eye
+    set_LOD_active
+    set_camera
+    set_dimensions
+    set_extension
+    set_override_submit_eye
+    set_post_processor_effect
+    tostring
+    update
+
+--- methods on post_processor (names only) ---
+  post_processor  (type=userdata):
+    __eq
+    __gc
+    __tostring
+    alive
+    extension
+    key
+    modifier
+    modifiers
+    set_extension
+    set_visibility
+    setup_sp
+    tostring
+    visibility
+
+--- methods on modifier (names only) ---
+  modifier  (type=userdata):
+    __eq
+    __gc
+    __tostring
+    alive
+    extension
+    key
+    material
+    set_extension
+    set_visibility
+    tostring
+    visibility
+
+--- fields on vp (any name containing rot/sky/orient/under) ---
+    <vp is not a table>
+
+--- rotation/sky/orientation-shaped names, all objects ---
+  (fields, not just methods)
+    <none>
+
+--- viewport._env_handler (the name rev2 looked for as a global) ---
+  type(_env_handler) = table
+  it is a cached instance.
+  _env_handler  (type=table):
+    <none found>
+
+--- next step ---
+  Everything above is read from objects that the Environment Editor
+  already calls every frame, so the chain is proven safe to touch.
+
+  If the method lists contain anything rotation-shaped -- set_rotation,
+  set_yaw_pitch_roll, set_sky_orientation, an underlay or orientation
+  setter on vp -- that is the real route to sky_orientation/rotation.
+  Nothing here has been called. Pick one name from the list above and
+  it can be tried in isolation next.
+
+=== end ===

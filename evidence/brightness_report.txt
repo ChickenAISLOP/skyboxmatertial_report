@@ -1,0 +1,29 @@
+=== brightness detection ===
+level                                      modders_devmap
+module_loaded                              true
+material route                             mat:set_variable is a SILENT NO-OP - proven rev1
+  material params_a                        0.9000, 0.5000, 2.0000
+  material params_b                        0.1500, 1.0000, 0.0000
+  material color0                          0.0000, 0.0000, 0.0000
+  material color2                          0.0000, 0.0000, 0.0000
+
+--- environment data paths ---
+env_handler                                present
+underlay_effect/sky_top/sky_intensity      no (false)
+underlay_effect/sky_bottom/sky_intensity   no (false)
+sky_top/sky_intensity                      no (false)
+sky_intensity                              no (false)
+sky_top_color_scale                        no (false)
+sky_bottom_color_scale                     no (false)
+others/sky_top_color_scale                 no (false)
+others/sky_bottom_color_scale              no (false)
+others/global_color_sky_a                  no (false)
+others/global_color_sky_b                  no (false)
+
+CHOSEN                                     none - no candidate data path is supported here
+base value                                 not captured yet
+supported here                             0 of 10
+enabled                                    false
+multiplier                                 1.00
+writes                                     0
+errors                                     0

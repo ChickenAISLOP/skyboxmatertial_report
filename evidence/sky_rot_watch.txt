@@ -1,0 +1,28 @@
+=== sky rotation watch (read-only) ===
+data path   = sky_orientation/rotation
+hashed key  = 3c084f67b1da34be
+samples     = 24 at 0.5s  (12s window)
+
+level at start = branchbank
+
+level at end = branchbank
+
+--- time series ---
+  active_viewports[1]  (24 value(s), 0 nil)
+     first=222.0000  last=222.0000  min=222.0000  max=222.0000  spread=0.0000
+     first 10: 222.00 222.00 222.00 222.00 222.00 222.00 222.00 222.00 222.00 222.00
+
+  first_active_viewport()  (24 value(s), 0 nil)
+     first=222.0000  last=222.0000  min=222.0000  max=222.0000  spread=0.0000
+     first 10: 222.00 222.00 222.00 222.00 222.00 222.00 222.00 222.00 222.00 222.00
+
+distinct levels seen during the window: 1
+
+--- verdict ---
+NOT animated. The rotation is constant on every viewport for
+the whole window, on a single level.
+The earlier 162 vs 338 difference therefore came from a different
+level or a different viewport, not from the game moving the sky.
+Your writes will stick.
+
+  Nothing was changed.

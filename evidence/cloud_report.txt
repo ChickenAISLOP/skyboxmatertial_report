@@ -1,0 +1,3 @@
+=== cloud layer TEST ===
+no material exposes uv0_speed in this level - ABORT, nothing changed.
+Try pd2_env_mex_sunset, pd2_env_chew_2, pd2_env_auc_ext or pd2_env_auc_int.

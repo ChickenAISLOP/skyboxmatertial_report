@@ -1,0 +1,30 @@
+[2026-10-15 13:12:51] loaded - idle. Enable from Options > skybox > Sky Rotation
+[2026-10-15 13:15:16] loaded - idle. Enable from Options > skybox > Sky Rotation
+[2026-10-15 13:17:58] loaded - idle. Enable from Options > skybox > Sky Rotation
+[2026-10-15 13:21:01] loaded - idle. Enable from Options > skybox > Sky Rotation
+[2026-10-15 13:21:25] started at 222.00 deg, speed 4.000 deg/s
+[2026-10-15 13:52:22] loaded - idle. Enable from Options > skybox > Sky Rotation
+[2026-10-15 13:53:24] started at 53.00 deg, speed 4.000 deg/s
+[2026-10-15 13:58:48] loaded - idle. Enable from Options > skybox > Sky Rotation
+[2026-10-15 14:06:27] loaded - idle. Enable from Options > skybox > Sky Rotation
+[2026-10-15 14:06:55] started at 53.00 deg, speed 62.933 deg/s
+[2026-10-15 14:08:43] lost the _env_handler, driver stopped
+[2026-10-15 14:08:49] loaded - idle. Enable from Options > skybox > Sky Rotation
+[2026-10-15 14:09:32] started at 53.00 deg, speed 4.000 deg/s
+[2026-10-15 14:11:39] lost the _env_handler, driver stopped
+[2026-10-15 14:11:46] loaded - idle. Enable from Options > skybox > Sky Rotation
+[2026-10-15 14:12:23] started at 53.00 deg, speed 4.000 deg/s
+[2026-10-15 14:13:13] loaded - idle. Enable from Options > skybox > Sky Rotation
+[2026-10-15 14:13:42] started at 53.00 deg, speed 4.000 deg/s
+[2026-10-15 14:15:07] lost the _env_handler, driver stopped
+[2026-10-15 14:15:14] loaded - idle. Enable from Options > skybox > Sky Rotation
+[2026-10-15 14:16:20] started at 53.00 deg, speed -5.752 deg/s
+[2026-10-15 14:17:07] loaded - idle. Enable from Options > skybox > Sky Rotation
+[2026-10-15 14:17:39] started at 53.00 deg, speed 4.000 deg/s
+[2026-10-15 14:17:41] stopped, rotation left at 53.00
+[2026-10-15 14:17:53] started at 53.00 deg, speed -1.173 deg/s
+[2026-10-15 14:23:51] loaded - idle. speed 4.00 deg/s. Enable from Options > skybox > Sky Animation
+[2026-10-15 14:24:14] started at 53.00 deg, speed 4.000 deg/s
+[2026-10-15 14:26:11] restored settings: enabled, speed 4.00 deg/s
+[2026-10-15 14:26:19] start refused: no viewport _env_handler
+[2026-10-15 14:26:19] started at 53.00 deg, speed 4.000 deg/s

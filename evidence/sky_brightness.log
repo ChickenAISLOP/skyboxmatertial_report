@@ -1,0 +1,226 @@
+[2026-10-15 13:52:22] loaded - idle. Brightness is a multiplier on the sky's own intensity.
+[2026-10-15 13:53:26] [bright] detection
+[bright] level                  modders_devmap
+[bright] underlay_loaded        true
+[bright] module_loaded          true
+[bright] sky_material           FOUND
+[bright] params_a               0.9000, 0.5000, 2.0000
+[bright] params_b               0.1500, 1.0000, 0.0000
+[bright] color0                 0.0000, 0.0000, 0.0000
+[bright] color2                 0.0000, 0.0000, 0.0000
+[bright] DETECTED sky int.      0.1500  (params_b.x)
+[bright]   -> x%.2f would be    0.1500
+[bright] writable               set_variable present
+[bright] enabled                false
+[bright] multiplier             1.00
+[bright] captured_original      none yet
+[bright] writes                 0
+[bright] errors                 0
+[2026-10-15 13:53:43] [bright] detection
+[bright] level                  modders_devmap
+[bright] underlay_loaded        true
+[bright] module_loaded          true
+[bright] sky_material           FOUND
+[bright] params_a               0.9000, 0.5000, 2.0000
+[bright] params_b               0.1500, 1.0000, 0.0000
+[bright] color0                 0.0000, 0.0000, 0.0000
+[bright] color2                 0.0000, 0.0000, 0.0000
+[bright] DETECTED sky int.      0.1500  (params_b.x)
+[bright]   -> x%.2f would be    0.0754
+[bright] writable               set_variable present
+[bright] enabled                false
+[bright] multiplier             0.50
+[bright] captured_original      none yet
+[bright] writes                 0
+[bright] errors                 0
+[2026-10-15 13:58:48] loaded - idle. Brightness is a multiplier on the sky's own intensity.
+[2026-10-15 13:59:36] [bright] detection
+[bright] level                  modders_devmap
+[bright] underlay_loaded        true
+[bright] module_loaded          true
+[bright] sky_material           FOUND
+[bright] params_a               0.9000, 0.5000, 2.0000
+[bright] params_b               0.1500, 1.0000, 0.0000
+[bright] color0                 0.0000, 0.0000, 0.0000
+[bright] color2                 0.0000, 0.0000, 0.0000
+[bright] DETECTED sky int.      0.1500  (params_b.x)
+[bright]   -> x%.2f would be    0.1500
+[bright] writable               set_variable present
+[bright] enabled                false
+[bright] multiplier             1.00
+[bright] captured_original      none yet
+[bright] writes                 0
+[bright] errors                 0
+[2026-10-15 14:06:27] loaded - idle. Brightness is a multiplier on the sky's own intensity.
+[2026-10-15 14:06:57] [bright] detection
+[bright] level                  modders_devmap
+[bright] underlay_loaded        true
+[bright] module_loaded          true
+[bright] sky_material           FOUND
+[bright] params_a               0.9000, 0.5000, 2.0000
+[bright] params_b               0.1500, 1.0000, 0.0000
+[bright] color0                 0.0000, 0.0000, 0.0000
+[bright] color2                 0.0000, 0.0000, 0.0000
+[bright] DETECTED sky int.      0.1500  (params_b.x)
+[bright]   -> x%.2f would be    0.1500
+[bright] writable               set_variable present
+[bright] enabled                false
+[bright] multiplier             1.00
+[bright] captured_original      none yet
+[bright] writes                 0
+[bright] errors                 0
+[2026-10-15 14:08:49] loaded - idle. Brightness is a multiplier on the sky's own intensity.
+[2026-10-15 14:09:23] [bright] detection
+[bright] level                  modders_devmap
+[bright] underlay_loaded        true
+[bright] module_loaded          true
+[bright] sky_material           FOUND
+[bright] params_a               0.9000, 0.5000, 2.0000
+[bright] params_b               0.1500, 1.0000, 0.0000
+[bright] color0                 0.0000, 0.0000, 0.0000
+[bright] color2                 0.0000, 0.0000, 0.0000
+[bright] DETECTED sky int.      0.1500  (params_b.x)
+[bright]   -> x%.2f would be    0.1500
+[bright] writable               set_variable present
+[bright] enabled                false
+[bright] multiplier             1.00
+[bright] captured_original      none yet
+[bright] writes                 0
+[bright] errors                 0
+[2026-10-15 14:09:29] captured original sky intensity 0.1500
+[2026-10-15 14:09:29] sky intensity 0.1500 -> 0.0697  (x0.46)
+[2026-10-15 14:09:30] [bright] detection
+[bright] level                  modders_devmap
+[bright] underlay_loaded        true
+[bright] module_loaded          true
+[bright] sky_material           FOUND
+[bright] params_a               0.9000, 0.5000, 2.0000
+[bright] params_b               0.1500, 1.0000, 0.0000
+[bright] color0                 0.0000, 0.0000, 0.0000
+[bright] color2                 0.0000, 0.0000, 0.0000
+[bright] DETECTED sky int.      0.1500  (params_b.x)
+[bright]   -> x%.2f would be    0.0697
+[bright] writable               set_variable present
+[bright] enabled                true
+[bright] multiplier             0.46
+[bright] captured_original      0.1500
+[bright] writes                 1
+[bright] errors                 0
+[2026-10-15 14:09:47] sky intensity 0.1500 -> 0.0275  (x0.18)
+[2026-10-15 14:09:47] sky intensity 0.1500 -> 0.0268  (x0.18)
+[2026-10-15 14:09:47] sky intensity 0.1500 -> 0.0268  (x0.18)
+[2026-10-15 14:09:47] sky intensity 0.1500 -> 0.0268  (x0.18)
+[2026-10-15 14:09:47] sky intensity 0.1500 -> 0.0261  (x0.17)
+[2026-10-15 14:09:47] sky intensity 0.1500 -> 0.0261  (x0.17)
+[2026-10-15 14:09:47] sky intensity 0.1500 -> 0.0261  (x0.17)
+[2026-10-15 14:09:47] sky intensity 0.1500 -> 0.0254  (x0.17)
+[2026-10-15 14:09:47] sky intensity 0.1500 -> 0.0254  (x0.17)
+[2026-10-15 14:09:47] sky intensity 0.1500 -> 0.0246  (x0.16)
+[2026-10-15 14:09:47] sky intensity 0.1500 -> 0.0239  (x0.16)
+[2026-10-15 14:09:47] sky intensity 0.1500 -> 0.0232  (x0.15)
+[2026-10-15 14:09:47] sky intensity 0.1500 -> 0.0232  (x0.15)
+[2026-10-15 14:09:47] sky intensity 0.1500 -> 0.0225  (x0.15)
+[2026-10-15 14:09:47] sky intensity 0.1500 -> 0.0218  (x0.15)
+[2026-10-15 14:09:47] sky intensity 0.1500 -> 0.0211  (x0.14)
+[2026-10-15 14:09:47] sky intensity 0.1500 -> 0.0204  (x0.14)
+[2026-10-15 14:09:47] sky intensity 0.1500 -> 0.0204  (x0.14)
+[2026-10-15 14:09:47] sky intensity 0.1500 -> 0.0189  (x0.13)
+[2026-10-15 14:09:47] sky intensity 0.1500 -> 0.0182  (x0.12)
+[2026-10-15 14:09:47] sky intensity 0.1500 -> 0.0168  (x0.11)
+[2026-10-15 14:09:47] sky intensity 0.1500 -> 0.0161  (x0.11)
+[2026-10-15 14:09:47] sky intensity 0.1500 -> 0.0146  (x0.10)
+[2026-10-15 14:09:47] sky intensity 0.1500 -> 0.0139  (x0.09)
+[2026-10-15 14:09:47] sky intensity 0.1500 -> 0.0125  (x0.08)
+[2026-10-15 14:09:47] sky intensity 0.1500 -> 0.0111  (x0.07)
+[2026-10-15 14:09:47] sky intensity 0.1500 -> 0.0111  (x0.07)
+[2026-10-15 14:09:47] sky intensity 0.1500 -> 0.0096  (x0.06)
+[2026-10-15 14:09:47] sky intensity 0.1500 -> 0.0089  (x0.06)
+[2026-10-15 14:09:47] sky intensity 0.1500 -> 0.0082  (x0.05)
+[2026-10-15 14:09:47] sky intensity 0.1500 -> 0.0075  (x0.05)
+[2026-10-15 14:09:47] sky intensity 0.1500 -> 0.0068  (x0.05)
+[2026-10-15 14:09:47] sky intensity 0.1500 -> 0.0068  (x0.05)
+[2026-10-15 14:09:47] sky intensity 0.1500 -> 0.0060  (x0.04)
+[2026-10-15 14:09:47] sky intensity 0.1500 -> 0.0060  (x0.04)
+[2026-10-15 14:09:47] sky intensity 0.1500 -> 0.0060  (x0.04)
+[2026-10-15 14:09:47] sky intensity 0.1500 -> 0.0060  (x0.04)
+[2026-10-15 14:09:47] sky intensity 0.1500 -> 0.0060  (x0.04)
+[2026-10-15 14:09:47] sky intensity 0.1500 -> 0.0060  (x0.04)
+[2026-10-15 14:09:47] sky intensity 0.1500 -> 0.0060  (x0.04)
+[2026-10-15 14:09:47] sky intensity 0.1500 -> 0.0060  (x0.04)
+[2026-10-15 14:09:47] sky intensity 0.1500 -> 0.0060  (x0.04)
+[2026-10-15 14:09:47] sky intensity 0.1500 -> 0.0060  (x0.04)
+[2026-10-15 14:09:47] sky intensity 0.1500 -> 0.0060  (x0.04)
+[2026-10-15 14:09:47] sky intensity 0.1500 -> 0.0060  (x0.04)
+[2026-10-15 14:09:47] sky intensity 0.1500 -> 0.0060  (x0.04)
+[2026-10-15 14:09:47] sky intensity 0.1500 -> 0.0060  (x0.04)
+[2026-10-15 14:09:47] sky intensity 0.1500 -> 0.0060  (x0.04)
+[2026-10-15 14:09:47] sky intensity 0.1500 -> 0.0060  (x0.04)
+[2026-10-15 14:09:47] sky intensity 0.1500 -> 0.0060  (x0.04)
+[2026-10-15 14:09:47] sky intensity 0.1500 -> 0.0060  (x0.04)
+[2026-10-15 14:09:47] sky intensity 0.1500 -> 0.0060  (x0.04)
+[2026-10-15 14:09:47] sky intensity 0.1500 -> 0.0060  (x0.04)
+[2026-10-15 14:09:47] sky intensity 0.1500 -> 0.0060  (x0.04)
+[2026-10-15 14:09:47] sky intensity 0.1500 -> 0.0060  (x0.04)
+[2026-10-15 14:09:47] sky intensity 0.1500 -> 0.0060  (x0.04)
+[2026-10-15 14:09:47] sky intensity 0.1500 -> 0.0060  (x0.04)
+[2026-10-15 14:09:47] sky intensity 0.1500 -> 0.0060  (x0.04)
+[2026-10-15 14:09:47] sky intensity 0.1500 -> 0.0060  (x0.04)
+[2026-10-15 14:09:47] sky intensity 0.1500 -> 0.0060  (x0.04)
+[2026-10-15 14:09:47] sky intensity 0.1500 -> 0.0060  (x0.04)
+[2026-10-15 14:09:47] sky intensity 0.1500 -> 0.0060  (x0.04)
+[2026-10-15 14:09:47] sky intensity 0.1500 -> 0.0060  (x0.04)
+[2026-10-15 14:09:47] sky intensity 0.1500 -> 0.0060  (x0.04)
+[2026-10-15 14:09:47] sky intensity 0.1500 -> 0.0060  (x0.04)
+[2026-10-15 14:09:47] sky intensity 0.1500 -> 0.0060  (x0.04)
+[2026-10-15 14:09:47] sky intensity 0.1500 -> 0.0060  (x0.04)
+[2026-10-15 14:09:47] sky intensity 0.1500 -> 0.0060  (x0.04)
+[2026-10-15 14:09:47] sky intensity 0.1500 -> 0.0060  (x0.04)
+[2026-10-15 14:09:47] sky intensity 0.1500 -> 0.0060  (x0.04)
+[2026-10-15 14:09:47] sky intensity 0.1500 -> 0.0060  (x0.04)
+[2026-10-15 14:09:47] sky intensity 0.1500 -> 0.0060  (x0.04)
+[2026-10-15 14:09:47] sky intensity 0.1500 -> 0.0060  (x0.04)
+[2026-10-15 14:09:47] sky intensity 0.1500 -> 0.0060  (x0.04)
+[2026-10-15 14:09:47] sky intensity 0.1500 -> 0.0060  (x0.04)
+[2026-10-15 14:09:47] sky intensity 0.1500 -> 0.0060  (x0.04)
+[2026-10-15 14:09:47] sky intensity 0.1500 -> 0.0060  (x0.04)
+[2026-10-15 14:09:47] sky intensity 0.1500 -> 0.0060  (x0.04)
+[2026-10-15 14:09:47] sky intensity 0.1500 -> 0.0060  (x0.04)
+[2026-10-15 14:09:47] sky intensity 0.1500 -> 0.0060  (x0.04)
+[2026-10-15 14:09:47] sky intensity 0.1500 -> 0.0060  (x0.04)
+[2026-10-15 14:09:47] sky intensity 0.1500 -> 0.0060  (x0.04)
+[2026-10-15 14:09:47] sky intensity 0.1500 -> 0.0060  (x0.04)
+[2026-10-15 14:09:47] sky intensity 0.1500 -> 0.0060  (x0.04)
+[2026-10-15 14:09:47] sky intensity 0.1500 -> 0.0060  (x0.04)
+[2026-10-15 14:09:47] sky intensity 0.1500 -> 0.0060  (x0.04)
+[2026-10-15 14:09:47] sky intensity 0.1500 -> 0.0060  (x0.04)
+[2026-10-15 14:09:47] sky intensity 0.1500 -> 0.0060  (x0.04)
+[2026-10-15 14:09:47] sky intensity 0.1500 -> 0.0060  (x0.04)
+[2026-10-15 14:09:47] sky intensity 0.1500 -> 0.0060  (x0.04)
+[2026-10-15 14:09:47] sky intensity 0.1500 -> 0.0060  (x0.04)
+[2026-10-15 14:09:47] sky intensity 0.1500 -> 0.0060  (x0.04)
+[2026-10-15 14:09:47] sky intensity 0.1500 -> 0.0060  (x0.04)
+[2026-10-15 14:09:47] sky intensity 0.1500 -> 0.0060  (x0.04)
+[2026-10-15 14:09:47] sky intensity 0.1500 -> 0.0060  (x0.04)
+[2026-10-15 14:09:47] sky intensity 0.1500 -> 0.0060  (x0.04)
+[2026-10-15 14:09:47] sky intensity 0.1500 -> 0.0060  (x0.04)
+[2026-10-15 14:09:47] sky intensity 0.1500 -> 0.0060  (x0.04)
+[2026-10-15 14:09:47] sky intensity 0.1500 -> 0.0060  (x0.04)
+[2026-10-15 14:09:47] sky intensity 0.1500 -> 0.0060  (x0.04)
+[2026-10-15 14:09:47] sky intensity 0.1500 -> 0.0060  (x0.04)
+[2026-10-15 14:09:47] sky intensity 0.1500 -> 0.0060  (x0.04)
+[2026-10-15 14:09:47] sky intensity 0.1500 -> 0.0060  (x0.04)
+[2026-10-15 14:09:47] sky intensity 0.1500 -> 0.0060  (x0.04)
+[2026-10-15 14:09:47] sky intensity 0.1500 -> 0.0060  (x0.04)
+[2026-10-15 14:09:47] sky intensity 0.1500 -> 0.0060  (x0.04)
+[2026-10-15 14:09:47] sky intensity 0.1500 -> 0.0060  (x0.04)
+[2026-10-15 14:09:47] sky intensity 0.1500 -> 0.0060  (x0.04)
+[2026-10-15 14:09:47] sky intensity 0.1500 -> 0.0060  (x0.04)
+[2026-10-15 14:09:47] sky intensity 0.1500 -> 0.0060  (x0.04)
+[2026-10-15 14:09:47] sky intensity 0.1500 -> 0.0060  (x0.04)
+[2026-10-15 14:09:47] sky intensity 0.1500 -> 0.0060  (x0.04)
+[2026-10-15 14:11:46] loaded rev2 - environment route. Material set_variable is a no-op.
+[2026-10-15 14:12:21] captured base 1.0000 from others/sun_ray_color_scale
+[2026-10-15 14:12:21] others/sun_ray_color_scale 1.0000 -> 0.4028 (x0.40) CONFIRMED
+[2026-10-15 14:13:13] loaded rev2 - environment route. Material set_variable is a no-op.
+[2026-10-15 14:15:14] loaded rev2 - environment route. Material set_variable is a no-op.
+[2026-10-15 14:17:07] loaded rev2 - environment route. Material set_variable is a no-op.

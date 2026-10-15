@@ -1,0 +1,30 @@
+=== environment swap inspection rev4 (read-only) ===
+level = big
+managers.viewport = table
+  environment methods: _get_environment_manager, create_global_environment_modifier, default_environment, destroy_global_environment_modifier, editor_add_environment_created_callback, editor_reload_environment, editor_reset_environment, game_default_environment, get_environment_value, get_predefined_environment_filter_map, preload_environment, set_default_environment, set_override_environment, update_global_environment_value
+
+--- viewport + env handler ---
+  active viewport  = table
+  _env_handler     = table
+
+--- restore target search ---
+  game_default_environment()                     = "core/environments/default"
+
+  RESTORE TARGET = core/environments/default
+  from           = managers.viewport:game_default_environment()
+
+--- candidates ---
+  environments/env_0200_night_moon_stars/env_0200_night_moon_stars YES
+  environments/env_1930_sunset_heavy_clouds/env_1930_sunset_heavy_clouds YES
+  environments/env_2003_dusk_blue/env_2003_dusk_blue             YES
+  environments/env_1945_sunset/env_1945_sunset                   YES
+  core/environments/default                                      YES
+
+--- live sky material, before any change ---
+  params_a   1.0000,0.0000,1.0000
+  params_b   0.2500,0.5000,0.0000
+  color0     0.0000,0.0000,0.0000
+  color1     <absent>
+  color2     0.0000,0.0000,0.0000
+
+  Nothing has been changed.
