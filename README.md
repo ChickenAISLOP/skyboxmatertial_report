@@ -18,7 +18,8 @@
 | `05_environment_binary_format.md` | Reverse engineering of the binary container + decoder |
 | `06_skybox_features.md` | **Feature spec sheet** — every feature, per-sky matrix, speed reference |
 | `07_feature_examples.md` | **One worked example per feature**, with real values |
-| `08_render_templates_shaders.md` | `dome_sky`/`dome_clouds`/`dome_sun`, shader inputs, the unused `color1` |
+| `08_render_templates_shaders.md` | `dome_sky`/`dome_clouds`/`dome_sun`, shader inputs, runtime probe |
+| `09_environment_authoring.md` | **How the sky is actually animated** — BeardLib, environment XML, the day/night recipe |
 
 ### Artifacts
 
@@ -100,7 +101,7 @@ legacy environments — they have no sun model at all.
 **`env_menu` is Tier 3.** The main menu runs the full stack with an animated sun. That
 is exactly where the mod was costing framerate.
 
-**Dome rotation is the only animation channel present in all 225 environments - but it is not reachable from a Lua mod.** See finding 5.
+**Dome rotation is the only animation channel present in all 225 environments - but it is not reachable from a Lua mod.** See finding 5 and `09`.
 
 ---
 
@@ -138,11 +139,24 @@ end
 
 ## Bottom line
 
-**The sky dome cannot be rotated or scrolled from a Lua mod.** Rotation exists in all
-225 environments but has no Lua handle; scrolling needs scene geometry and custom
-`dome_clouds` materials. Sweeping the four writable variables gives a slow colour
-wash, not movement. Full reasoning in `04_animated_skybox_options.md`, runtime evidence
-in `08_render_templates_shaders.md`.
+**Yes — but not the way the earlier drafts of this report said.** The sky is animated by
+**replacing the whole environment**, not by moving the dome.
+
+Four parameters do it: `underlay`, `color0`, `color2`, `sun_ray_color`. A working
+17-variant day/night cycle ships in the `Day & Night Full` mod, driven by
+`managers.worlddefinition:_set_environment()`. The dome never rotates; it is re-graded.
+
+```lua
+BeardLib:ReplaceScriptData(path, "custom_xml", "environments/morning", "environment", true)
+managers.worlddefinition:_set_environment("environments/morning")
+```
+
+`BeardLib-Editor` provides a GUI for this. Full schema, key paths and the worked
+recipe are in `09_environment_authoring.md`.
+
+Runtime Lua on the material is limited to four variables (`params_a`, `params_b`,
+`color0`, `color2`), and that surface only produces a slow colour wash. Rotation is
+authorable in the file but not drivable from Lua. See `08` and `09`.
 
 ---
 
@@ -195,7 +209,8 @@ Diesel Crate Browser export of
 | Literal float constants | 2,210 slots, 575 distinct |
 | Live sky values | Probed in-game: `params_a`/`params_b` match static decoding exactly |
 | Lua-reachable sky controls | **4 variables** — `params_a`, `params_b`, `color0`, `color2` |
-| `sky_orientation/rotation` | **Not reachable from Lua** — C++-internal, see `08` |
+| Environment XML schema | Full schema recovered from BeardLib - see `09` |
+| `sky_orientation/rotation` | **Authorable in file**, not drivable from Lua |
 | Environment node/value block | **Partially decoded** — 40-byte descriptor table mapped, field semantics unknown, see `05` |
 
 ### Known gap: `units/` was never exported

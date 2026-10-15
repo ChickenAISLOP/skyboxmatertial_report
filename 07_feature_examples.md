@@ -229,18 +229,17 @@ color1    <absent>
 color2    Vector3(0.0000, 0.0000, 0.0000)
 ```
 
-`params_a` and `params_b` match the static config exactly — the binary decoding in
-this document is confirmed against live values. `color0` and `color2` do **not**: the
-config says `1.0 1.0 1.0`, the running material reads `0, 0, 0`. Both are present,
-both are writable.
+`params_a` and `params_b` match the static config exactly - the binary decoding in
+this document is confirmed against live values, and `09` records third-party
+corroboration of the component meanings.
 
-`color1` is declared by the dome shader but `variable_exists` returns **false** at
-runtime, and the write path is gated on the same check, so it is **not settable**. An
-unused shader input, not a free parameter.
+`color0` and `color2` do **not**. **The environment overrides the material**: the key
+path `underlay_effect/sky/color0` in the `.environment` file is what actually drives
+the dome tint, and the material-level `color0` is only a fallback. See `09`.
 
-This is the variable set the existing mod's author probed and concluded the sky was
-static from. The conclusion was right; `color0`/`color2` just aren't where the live
-values live.
+`color1` is declared by the dome shader, and `variable_exists` returns **false** on a
+sky that does not set it. It **is** authorable, as `underlay_effect/sky/color1` - see
+`09`.
 
 Note the environment binary uses the same key names (`color0`, `color2`, plus
 `color0_scale`, `color2_scale`, `sky_top_color`, `sky_bottom_color`) — those are

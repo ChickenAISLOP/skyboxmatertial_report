@@ -46,12 +46,12 @@ param(
 function Read-Environment([string]$file){
   $b = [System.IO.File]::ReadAllBytes($file)
 
-  $fpc = [int][BitConverter]::ToInt64($b,0x008)
-  $fpo = [int][BitConverter]::ToInt64($b,0x018)
-  $sc  = [int][BitConverter]::ToInt64($b,0x028)
-  $srt = [int][BitConverter]::ToInt64($b,0x038)
-  $sre = [int][BitConverter]::ToInt64($b,0x058)
-  $aux = [int][BitConverter]::ToInt64($b,0x048)
+  $fpc = [int64][BitConverter]::ToInt64($b,0x008)
+  $fpo = [int64][BitConverter]::ToInt64($b,0x018)
+  $sc  = [int64][BitConverter]::ToInt64($b,0x028)
+  $srt = [int64][BitConverter]::ToInt64($b,0x038)
+  $sre = [int64][BitConverter]::ToInt64($b,0x058)
+  $aux = [int64][BitConverter]::ToInt64($b,0x048)
 
   # string table: record i lives at srt+8+i*16, first u32 is the byte offset
   $strs = New-Object System.Collections.Generic.List[string]

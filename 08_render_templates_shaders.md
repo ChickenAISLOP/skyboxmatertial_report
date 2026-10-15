@@ -242,7 +242,7 @@ across every reachable method and field, returned **zero hits**.
 
 **There is no Lua-facing setter for `sky_orientation/rotation`.** `SkyRotationFeeder`
 is C++-internal and consumes the key directly from the environment data. The rotation
-is real and present in all 225 environments, but it is not moddable.
+is real and present in all 225 environments, but not drivable at runtime.
 
 This resolves what `03`, `04` and `07` previously left open.
 
@@ -250,7 +250,12 @@ This resolves what `03`, `04` and `07` previously left open.
 
 Those documents described rotation as "the cheapest possible win" and "the only
 animation channel available in all 225 environments". Both are true of the **engine**
-and false for **modding**. A sky dome cannot be rotated from a Lua mod.
+and false for **runtime Lua**. A sky dome cannot be rotated from a Lua mod.
+
+**Further correction, see `09`.** "Not drivable at runtime" is not the same as "not
+moddable". `sky_orientation/rotation` is authorable in the environment file, and the
+primary sky-animation mechanism is swapping whole environments, not moving the dome.
+This section was too strong. `09` documents the real routes.
 
 ### What is actually animatable
 
@@ -260,13 +265,16 @@ and false for **modding**. A sky dome cannot be rotated from a Lua mod.
 | `params_b` | `0.15, 1, 0` | yes | sky intensity / sun intensity |
 | `color0` | `0, 0, 0` | yes | sky tint |
 | `color2` | `0, 0, 0` | yes | sky tint |
-| `color1` | absent | **no** | gate returns false |
+| `color1` | absent on this sky | **yes**, as `underlay_effect/sky/color1` - see `09` |
 
 `params_a` and `params_b` at runtime match the static config decoding exactly, which
-validates the binary analysis throughout this report.
+validates the binary analysis throughout this report. `09` adds third-party
+corroboration of the component meanings.
 
-Sweeping `params_b.x` sky intensity and `params_a` over time produces a slow colour
-wash. It is not scrolling clouds and not a rotating dome — the dome cannot do either.
+Sweeping these over time produces a slow colour wash - that is all the runtime Lua
+surface offers. It is **not** the way the sky is animated in practice. For that, see
+`09`: the engine re-grades the dome through the environment's
+`underlay_effect/sky/*` keys, and whole environments are swapped at runtime.
 
 ---
 
