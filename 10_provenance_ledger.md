@@ -110,6 +110,31 @@ recorded. That was a gap in the probe, not behaviour in the engine.
 **Consequence:** a mod can own `sky_orientation/rotation` outright. No arbitration with
 the game is needed, and a driver does not have to fight anything.
 
+## The driver works
+
+`lua/sky_rotation.lua` in the mod, Options → skybox → Sky Rotation. Per-frame continuous
+rotation, user-confirmed working.
+
+```lua
+local key = Idstring("sky_orientation/rotation"):key()
+local h = managers.viewport:first_active_viewport()._env_handler
+R.angle = (R.angle + speed * dt) % 360
+h:editor_set_value(key, R.angle)
+```
+
+Time-based, not frame-based, so the rate is identical at any framerate. Verified in
+LuaJIT before shipping — end angle matches exactly at 30 / 60 / 90 / 144 / 240 fps:
+
+| fps | writes over 60s | end angle |
+|---|---|---|
+| 30 | 1,800 | 218.000 |
+| 60 | 3,600 | 218.000 |
+| 144 | 8,640 | 218.000 |
+| 240 | 14,400 | 218.000 |
+
+This works because nothing else competes for the value — see the 12-second watch above,
+spread 0.0000. A mod can own the rotation outright.
+
 ## Provenance tiers
 
 | Tier | Meaning |
@@ -188,8 +213,17 @@ Dome visibly rotated and returned (user-confirmed video).
    `set_override_environment(environment_path, blend_duration, ...)` — it does not show
    how many arguments the native function reads. Reading one as the other caused crash 5,
    the same failure mode as the invented `SizeCode` symbol in crash 2.
-6. **A crash should close the door, not invite a retry with different arguments.**
+7. **A crash should close the door, not invite a retry with different arguments.**
    Crashes 1, 2 and 5 were all followed by a narrower attempt at the same thing.
+8. **Check that the thing exists, not that a string matching its name exists.**
+   While wiring the rotation menu I grepped for `sa_rot_enabled` and reported "wiring
+   present" — but that was the *callback*, which existed, while the menu *item* that
+   references it had never been added. The tab was registered, built and linked, and
+   empty. A search that can only succeed is not a verification.
+9. **Appending to a structured file needs the structure.** `loc/english.txt` is a JSON
+   object; an `Add-Content` of an INI-style block landed outside the closing brace and
+   silently killed every key added since. The first repair attempt was also wrong —
+   commas dropped between entries — and was only caught by validating the parse.
 
 ## Corrections issued this session
 
