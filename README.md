@@ -16,6 +16,7 @@
 | `03_environment_schema.md` | `.environment` schema, the three tiers, full key list, sky→environment map |
 | `04_animated_skybox_options.md` | The three animation routes, effort vs payoff, why the current mod stalls |
 | `05_environment_binary_format.md` | Reverse engineering of the binary container + decoder |
+| `06_skybox_features.md` | **Feature spec sheet** — every feature, per-sky matrix, speed reference |
 
 ### Artifacts
 
