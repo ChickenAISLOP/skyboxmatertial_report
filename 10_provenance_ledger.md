@@ -4,6 +4,49 @@
 single largest error in this investigation was an *inference* presented with the same
 confidence as a measurement. Recording which claims rest on what, makes that visible.
 
+## Environment swap cannot be tested in this mod configuration
+
+A separate, non-crash finding, and the reason swap is still unverified.
+
+Both swap routes access-violated **inside `PackageManager:_script_data`**, reached via
+BeardLib's `FileManager:Process:46`:
+
+| Route | Result |
+|---|---|
+| `managers.viewport:set_override_environment(path, blend)` | access violation (crash 5 — my argument-count guess) |
+| `worlddefinition:_set_environment(path)` | access violation (crash 6) |
+
+The second is the important one. `_set_environment` had already been called in rev1
+without crashing, so it looked safe. It was only safe because the argument was
+`core/environments/default` — **already loaded, so nothing actually loaded**. Point it at
+a real environment and it loads one, and the load faults.
+
+The load path with BeardLib installed:
+
+```
+worlddefinition:_set_environment(path)
+  preload_environment        coreviewportmanager.lua:148
+    preload_environment      coreenvironmentmanager.lua:107
+      _load                  coreenvironmentmanager.lua:258
+        BeardLib FileManager:Process:46
+          PackageManager:_script_data   ← access violation
+```
+
+`BeardLib/Classes/Managers/FileManager.lua:23` does `FileManager = self`, so BeardLib
+handles every script-data load once installed, and line 40 auto-registers environment
+assets before line 46 reads them.
+
+**Ruled out:** a string where an `Idstring` was required. That was the obvious
+explanation — it caused crash 1 — but the `Day & Night Full` mod passes plain strings to
+`_set_environment` (`override_all[k] = v.value`), so a string is the accepted type.
+
+**Not ruled out:** whether this is a BeardLib bug, a conflict with the `environment
+editor` mod also in `mods/`, or a genuine engine limitation. No further attempt was
+made; two crashes is enough.
+
+The swap TEST button has been **removed from the menu**, not hidden. The read-only
+inspect remains, since it only reads.
+
 ## Every crash in this investigation was mine
 
 Five, all self-inflicted, all from the same family of mistake — calling something whose
@@ -16,6 +59,7 @@ argument convention had not been established.
 | 3 | `local a = 1, b = 2` (invalid declaration) | yes |
 | 4 | `DelayManager` — a global that does not exist in this build | yes |
 | 5 | `set_override_environment(path, blend)` — guessed argument count | **no** — access violation |
+| 6 | `_set_environment` with a real (not already-loaded) environment | **no** — access violation |
 
 **Crash 5 in detail.** `coreviewportmanager.lua` lists
 `set_override_environment(environment_path, blend_duration, ...)` — with more arguments
@@ -93,7 +137,7 @@ Dome visibly rotated and returned (user-confirmed video).
 | 4 writable sky-material variables | 1 | live probe; matches static decode |
 | `_set_environment` callable | 1 | live call returned without raising |
 | Environment DB path form `environments/<dir>/<name>` | 1 | 5/5 candidates returned `YES` |
-| Environment swap changes the rendered sky | **4** | **not demonstrated** — no before/after image or reverted swap |
+| Environment swap changes the rendered sky | **4** | **not demonstrated, and not safely testable** — both routes access-violate through BeardLib's `FileManager:Process` |
 | Day & Night 17-variant cycle works | 3 | third-party mod source; mod never loaded |
 | 3 dome templates, 1 used | 2 | DXBC reflection from `environment.d3d11.shaders` |
 | `uv_velocity_*` live under `cloud_overlay/` | 3 | BLE key-path list; our decoder flattened it |

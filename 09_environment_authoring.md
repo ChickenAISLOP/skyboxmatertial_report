@@ -26,7 +26,7 @@ rotation variable, and reported that as "no Lua-facing setter". Rotation is an
 |---|---|---|
 | `sky_orientation/rotation` at runtime | `_env_handler:editor_set_value` | **Tier 1 — write, read-back and restore confirmed in-game** |
 | `sky_orientation/rotation` as a file parameter | present in all 25 Day & Night XML files and in the BeardLib template | Tier 2 — file re-derivation |
-| Whole-environment swap at runtime | `managers.worlddefinition:_set_environment()` | Tier 2 — callable, candidates verified, **rendered result not yet confirmed** |
+| Whole-environment swap at runtime | `managers.worlddefinition:_set_environment()` | **blocked** — call is confirmed present and both candidate paths and the restore target verify, but any real load access-violates through BeardLib. See `10` |
 | Colour grading elements | `EditorEnvironment` in BeardLib-Editor | Tier 3 — third-party source |
 
 ### Rotation, verified
