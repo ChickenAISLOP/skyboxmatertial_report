@@ -158,15 +158,26 @@ if mat:variable_exists(Idstring("color0")) then
 end
 ```
 
-| Variable | Live value | Writable |
-|---|---|---|
-| `params_a` | `0.9, 0.5, 2.0` | yes |
-| `params_b` | `0.15, 1, 0` | yes |
-| `color0` | `0, 0, 0` | yes |
-| `color2` | `0, 0, 0` | yes |
-| `color1` | absent | **no** |
+| Variable | Live value | Variable exists | Write tested |
+|---|---|---|---|
+| `params_a` | `0.9, 0.5, 2.0` | yes | **no** |
+| `params_b` | `0.15, 1, 0` | yes | **no** |
+| `color0` | `0, 0, 0` | yes | **no** |
+| `color2` | `0, 0, 0` | yes | **no** |
+| `color1` | absent | no | no |
 
 `params_a`/`params_b` match the static decoding exactly, validating the binary analysis.
+
+> **Correction, second pass.** An earlier version of this table had a `Writable` column
+> reading `yes` for the four present variables. That was **wrong, and it was inference
+> presented in the same table as measured values.** The probe called
+> `variable_exists` and `get_variable` — both read-only — and `variable_exists`
+> returning true was restated as "writable". No `set_variable` call had ever been made
+> at that point; the only mention of it anywhere in the mod was inside a comment.
+>
+> This is the same failure as the rotation retraction, in a smaller costume: a correct
+> observation about *existence* generalised into a claim about a different property.
+> The `Live value` column is measured. The `Write tested` column is honestly empty.
 
 **Correction.** The material probe was sound; the inference drawn from it was not. Four
 variables on the material is a statement about the *material*, not about the engine.

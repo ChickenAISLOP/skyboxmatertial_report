@@ -110,6 +110,27 @@ recorded. That was a gap in the probe, not behaviour in the engine.
 **Consequence:** a mod can own `sky_orientation/rotation` outright. No arbitration with
 the game is needed, and a driver does not have to fight anything.
 
+## The "Writable: yes" column was inference
+
+Found while wiring a brightness control, and it is the same mistake as the rotation
+retraction in a smaller costume.
+
+The sky probe called `variable_exists` and `get_variable`. Both are read-only. The
+report's table had three columns — `Variable`, `Live value`, `Writable` — and the first
+two were measured while the third was `variable_exists` returning true, restated as
+"yes".
+
+At the time the claim was made, **no `set_variable` call existed anywhere in the mod**.
+The only occurrence of the string was inside a comment showing the intended syntax. A
+reader had no way to tell a measured column from an inferred one, because they were in
+the same table with the same formatting.
+
+Two columns now separate `Variable exists` (measured) from `Write tested` (honestly
+empty). The `params_b.x` brightness control is the feature that will fill it in.
+
+The generalisable lesson is the rotation one again: **existence is not writability, and
+an inferred value placed beside measured ones inherits their credibility.**
+
 ## The driver works
 
 `lua/sky_rotation.lua` in the mod, Options → skybox → Sky Rotation. Per-frame continuous
@@ -188,7 +209,8 @@ Dome visibly rotated and returned (user-confirmed video).
 | `_environment_modifier_id` == rotation key hash | 1 | live probe, value `3c084f67b1da34be` |
 | **Nothing animates the rotation in a heist** | **1** | 24 samples over 12s on `branchbank`, spread **0.0000**, both viewports agreeing |
 | Rotation survives a level change without a fight | 1 | implied by the above — no competing writer exists |
-| 4 writable sky-material variables | 1 | live probe; matches static decode |
+| 4 sky-material variables **exist and are readable** | 1 | live probe; values match static decode |
+| Those 4 variables are **writable** | **4** | **inference from `variable_exists`. No `set_variable` call had been made when this was claimed.** See below |
 | `_set_environment` callable | 1 | live call returned without raising |
 | Environment DB path form `environments/<dir>/<name>` | 1 | 5/5 candidates returned `YES` |
 | Environment swap changes the rendered sky | **4** | **not demonstrated, and not safely testable** — both routes access-violate through BeardLib's `FileManager:Process` |
