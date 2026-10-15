@@ -83,6 +83,33 @@ duration, which `_set_environment` does not) but is not safely callable without 
 `worlddefinition:_set_environment(path)` is used instead: it was called in rev1 without
 raising and without crashing, and it is what the Day & Night mod calls.
 
+## Is anything else already animating the rotation?
+
+Asked because two inspections five minutes apart read `162` and `338`.
+
+**No. Measured, not inferred.** A 12-second watch sampled the rotation 24 times on
+`branchbank`:
+
+| Viewport | First | Last | Min | Max | Spread |
+|---|---|---|---|---|---|
+| `active_viewports[1]` | 222.0000 | 222.0000 | 222.0000 | 222.0000 | **0.0000** |
+| `first_active_viewport()` | 222.0000 | 222.0000 | 222.0000 | 222.0000 | **0.0000** |
+
+One level for the whole window, both viewport accessors in exact agreement, zero drift.
+
+The file evidence agrees and predicted it: `sky_rot` appears in exactly four files in
+the entire export, all editor or lobby Lua. Zero `.environment` files, zero `.level`
+files, zero occurrences in `playerstandard.lua`. `coreworlddefinition` reads
+`self._environment.sky_rot` once at load and calls `create_global_environment_modifier`;
+the only later writers are an editor slider and the lobby's `_set_sky_rotation_angle`.
+
+So the `162` vs `338` difference was **two different levels**. `162` was read on `big`;
+the rotation probe's TEST did not log the level, so which level produced `338` was never
+recorded. That was a gap in the probe, not behaviour in the engine.
+
+**Consequence:** a mod can own `sky_orientation/rotation` outright. No arbitration with
+the game is needed, and a driver does not have to fight anything.
+
 ## Provenance tiers
 
 | Tier | Meaning |
@@ -134,6 +161,8 @@ Dome visibly rotated and returned (user-confirmed video).
 | Rotation present in 225/225 environments | 2 | key decoded from every `.environment` |
 | `has_data_path_key(sky_orientation/rotation)` = YES | 1 | live probe |
 | `_environment_modifier_id` == rotation key hash | 1 | live probe, value `3c084f67b1da34be` |
+| **Nothing animates the rotation in a heist** | **1** | 24 samples over 12s on `branchbank`, spread **0.0000**, both viewports agreeing |
+| Rotation survives a level change without a fight | 1 | implied by the above — no competing writer exists |
 | 4 writable sky-material variables | 1 | live probe; matches static decode |
 | `_set_environment` callable | 1 | live call returned without raising |
 | Environment DB path form `environments/<dir>/<name>` | 1 | 5/5 candidates returned `YES` |

@@ -193,6 +193,12 @@ h:editor_set_value(key, current_angle + degrees_per_second * dt)
 
 It is present in **225 / 225** environments, so it is not a per-level special case.
 
+**Nothing else writes to it during a heist.** A 12-second watch sampled it 24 times and
+measured a spread of **0.0000** — completely static, with both viewports agreeing. The
+file evidence agrees: `sky_rot` appears in only four files in the whole export, all
+editor or lobby Lua, and the modifier is created once at level load. A mod can
+therefore own the rotation outright, with nothing to arbitrate against.
+
 ### 2. Environment swap — re-grades the whole sky
 
 Four parameters do it: `underlay`, `color0`, `color2`, `sun_ray_color`. A working
