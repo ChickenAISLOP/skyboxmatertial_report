@@ -216,12 +216,27 @@ Goes **negative** on twilight skies, pushing the gradient band up the dome:
 <variable name="color2" type="vector3" value="1.0 1.0 1.0"/>   <!-- sky bottom -->
 ```
 
-**All 38 of 38 skies ship `1.0 1.0 1.0` for both** — zero exceptions. They are inert
-defaults, unused by the gradient, which `params_a` controls instead.
+**All 38 of 38 skies ship `1.0 1.0 1.0` for both** in the config file. That is the
+*static* value.
 
-The dome shader declares a **third** colour input, `ref_color1`, which **0 of 38**
-configs ever set. It is a free, permanently-default middle band. See
-`08_render_templates_shaders.md`.
+At runtime it is a different number. Live probe of `modders_devmap`:
+
+```
+params_a  Vector3(0.9000, 0.5000, 2.0000)
+params_b  Vector3(0.1500, 1.0000, 0.0000)
+color0    Vector3(0.0000, 0.0000, 0.0000)
+color1    <absent>
+color2    Vector3(0.0000, 0.0000, 0.0000)
+```
+
+`params_a` and `params_b` match the static config exactly — the binary decoding in
+this document is confirmed against live values. `color0` and `color2` do **not**: the
+config says `1.0 1.0 1.0`, the running material reads `0, 0, 0`. Both are present,
+both are writable.
+
+`color1` is declared by the dome shader but `variable_exists` returns **false** at
+runtime, and the write path is gated on the same check, so it is **not settable**. An
+unused shader input, not a free parameter.
 
 This is the variable set the existing mod's author probed and concluded the sky was
 static from. The conclusion was right; `color0`/`color2` just aren't where the live

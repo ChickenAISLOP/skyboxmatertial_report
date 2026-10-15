@@ -144,7 +144,7 @@ Every `ref_*` name maps to a key recovered from the `.environment` binaries:
 This is independent confirmation that the 49-environment Tier-3 block is the cloud and
 sun pass, read by a shader that takes a time uniform.
 
-### 2. `color1` is a real input that no config ever sets
+### 2. `color1` is a real input that no config ever sets — and it is not writable
 
 The dome shader wants **three** colour inputs: `color0`, `color1`, `color2`.
 
@@ -155,13 +155,27 @@ Every sky config declares only `color0` and `color2`:
 <variable name="color2" type="vector3" value="1.0 1.0 1.0"/>
 ```
 
-**0 of 38** sky configs declare `color1`. It is an unused middle band, permanently at
-its default. That is consistent with `params_a` shaping the gradient across the dome:
-a three-stop gradient would want a mid colour, and the engine reserves one but the art
-never fills it.
+**0 of 38** sky configs declare `color1`. That is consistent with `params_a` shaping
+the gradient across the dome: a three-stop gradient would want a mid colour, and the
+engine reserves one but the art never fills it.
 
-This is the most actionable finding in this document: `color1` is a free parameter
-nothing is using.
+**Correction.** An earlier revision of this document called `color1` "a free parameter
+nothing is using". That was wrong. A live probe shows `variable_exists("color1")`
+returns **false**, and the only known write path gates on that same check:
+
+```lua
+if mat:variable_exists(Idstring("color0")) then
+    mat:set_variable(Idstring("color0"), v)
+end
+```
+
+So `color1` is an unused shader input, not an exposed one. It cannot be set.
+
+### 2b. `color0` / `color2` are live, not inert
+
+Also a correction. The static configs say `1.0 1.0 1.0`. At runtime they read
+`Vector3(0, 0, 0)`. Both exist, both are writable, and both are currently black.
+They are not the inert defaults this document originally described.
 
 ### 3. `ref_time` is the animation clock
 
@@ -178,22 +192,81 @@ authored on `dome_sun` would take a colour directly rather than through `params_
 
 ---
 
-## Still not resolved
+## Runtime probe: what is actually reachable from Lua
 
-`params_a` and `params_b` are confirmed as the dome shader's two vector3 inputs, but
-their **per-component meaning** stays inferred from observed values, not read from
-source. The compiled bytecode would need disassembly to settle it. What is now
-verified is that they are exactly two vectors and nothing else — the earlier "six
-variables, none animate" claim holds, with `color1` added as a seventh slot the art
-never fills.
+A read-only BLT probe was run in-game against `modders_devmap` to enumerate every
+Lua-reachable object on the environment. Method lists recovered via
+`getmetatable(obj).__index` (the `vp`, `post_processor` and `modifier` objects are
+userdata, so `pairs()` returns nothing on them).
 
-| Slot | Shader input | Set by configs | Value |
+**Proven write path** — copied from `mods/environment editor/env.lua`, which calls it
+every frame:
+
+```lua
+local mat = Underlay:material(Idstring("sky"))
+if mat:variable_exists(Idstring("color0")) then
+    local v = mat:get_variable(Idstring("color0"))
+    mat:set_variable(Idstring("color0"), v)
+end
+```
+
+**Environment object chain** — also from `env.lua`:
+
+```
+managers.viewport:first_active_viewport()          -> table
+  :vp()                                            -> userdata
+    :get_post_processor_effect("World", Idstring("deferred"))
+      :modifier(Idstring("apply_ambient"))         -> userdata
+        :material()                                -> userdata
+```
+
+Complete method inventory:
+
+| Object | Methods |
+|---|---|
+| `vp` | `camera`, `director`, `update`, `extension`, `key`, `alive`, `get_rect`, `set_dimensions`, `get_post_processor_effect`, `set_post_processor_effect`, `get_post_processor_effect_name`, `set_LOD_active`, `override_submit_eye`, `set_override_submit_eye` |
+| `post_processor` | `modifier`, `modifiers`, `set_visibility`, `visibility`, `extension`, `key`, `alive` |
+| `modifier` | `material`, `set_visibility`, `visibility`, `extension`, `key`, `alive` |
+
+Viewport fields: `__manager`, `__name`, `__active_requested`, `__really_activated`,
+`_env_handler`, `_vp`, `_vpm`, `_replaced_vp`, `_render_params`, `_init_trace`,
+`_ref_fov_stack`, `_enable_adaptive_quality`, `_width_mul_enabled`.
+
+### `sky_orientation/rotation` is not reachable — closed
+
+`CoreSky`, `EnvironmentHandler` and `EnvironmentManager` are **not globals** at
+runtime. `viewport._env_handler` exists but is an empty table.
+
+A filter for any name containing `rot`, `sky`, `orient`, `underlay` or `sun`, run
+across every reachable method and field, returned **zero hits**.
+
+**There is no Lua-facing setter for `sky_orientation/rotation`.** `SkyRotationFeeder`
+is C++-internal and consumes the key directly from the environment data. The rotation
+is real and present in all 225 environments, but it is not moddable.
+
+This resolves what `03`, `04` and `07` previously left open.
+
+### Correction
+
+Those documents described rotation as "the cheapest possible win" and "the only
+animation channel available in all 225 environments". Both are true of the **engine**
+and false for **modding**. A sky dome cannot be rotated from a Lua mod.
+
+### What is actually animatable
+
+| Variable | Live value | Writable | Reads as |
 |---|---|---|---|
-| 1 | `ref_params_a` | 38 / 38 | range, offset, curve (inferred) |
-| 2 | `ref_params_b` | 38 / 38 | sky intensity, sun intensity (inferred) |
-| 3 | `ref_color0` | 38 / 38 | always `1.0 1.0 1.0` |
-| 4 | `ref_color1` | **0 / 38** | never set |
-| 5 | `ref_color2` | 38 / 38 | always `1.0 1.0 1.0` |
+| `params_a` | `0.9, 0.5, 2.0` | yes | gradient spread / offset / curve |
+| `params_b` | `0.15, 1, 0` | yes | sky intensity / sun intensity |
+| `color0` | `0, 0, 0` | yes | sky tint |
+| `color2` | `0, 0, 0` | yes | sky tint |
+| `color1` | absent | **no** | gate returns false |
+
+`params_a` and `params_b` at runtime match the static config decoding exactly, which
+validates the binary analysis throughout this report.
+
+Sweeping `params_b.x` sky intensity and `params_a` over time produces a slow colour
+wash. It is not scrolling clouds and not a rotating dome — the dome cannot do either.
 
 ---
 

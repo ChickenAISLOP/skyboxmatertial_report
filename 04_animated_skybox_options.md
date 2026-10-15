@@ -52,15 +52,25 @@ because it only looked at the dome.
 
 ---
 
-## Option A — Dome rotation (cheapest, works everywhere)
+## Option A — Dome rotation — **NOT POSSIBLE FROM A MOD**
 
 `sky_orientation.rotation` exists in **all 225 environments**.
 
+> **This option is closed.** A live in-game probe found no Lua-facing setter.
+> `SkyRotationFeeder` is C++-internal and consumes the key directly from the
+> environment data. A filter for `rot` / `sky` / `orient` / `underlay` / `sun` across
+> every reachable object, method and field returned zero hits, and `CoreSky`,
+> `EnvironmentHandler` and `EnvironmentManager` are not globals. See `08`.
+>
+> Everything below was written before that probe and describes the intent, not an
+> achievable mod. Retained because the reasoning still explains *why* the other
+> options exist.
+
 Skybox rotation is a display concern, not an art concern. A slowly rotating dome
 reads as a moving sky even with zero texture animation. This is what most "animated
-skybox" mods actually do.
+skybox" mods assume.
 
-**Pros**
+**Pros** (if it were reachable)
 - Available in every environment, no exceptions
 - One value, trivial to drive
 - No new assets, no new textures, no disk cost

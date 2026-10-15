@@ -100,15 +100,49 @@ legacy environments — they have no sun model at all.
 **`env_menu` is Tier 3.** The main menu runs the full stack with an animated sun. That
 is exactly where the mod was costing framerate.
 
-**Dome rotation is the only animation channel available in all 225 environments.**
+**Dome rotation is the only animation channel present in all 225 environments - but it is not reachable from a Lua mod.** See finding 5.
+
+---
+
+### 5. Runtime probe: only four sky variables are moddable
+
+An in-game read-only probe enumerated every Lua-reachable environment object.
+
+`CoreSky`, `EnvironmentHandler`, `EnvironmentManager` are **not globals**. The live
+route is `managers.viewport:first_active_viewport():vp():get_post_processor_effect(...)`.
+
+A filter for `rot` / `sky` / `orient` / `underlay` / `sun` across all reachable methods
+and fields returned **zero hits**. There is no Lua setter for
+`sky_orientation/rotation` - `SkyRotationFeeder` is C++-internal.
+
+Exactly four variables are writable, via the same path the Environment Editor uses:
+
+```lua
+local mat = Underlay:material(Idstring("sky"))
+if mat:variable_exists(Idstring("color0")) then
+    mat:set_variable(Idstring("color0"), v)
+end
+```
+
+| Variable | Live value | Writable |
+|---|---|---|
+| `params_a` | `0.9, 0.5, 2.0` | yes |
+| `params_b` | `0.15, 1, 0` | yes |
+| `color0` | `0, 0, 0` | yes |
+| `color2` | `0, 0, 0` | yes |
+| `color1` | absent | **no** |
+
+`params_a`/`params_b` match the static decoding exactly, validating the binary analysis.
 
 ---
 
 ## Bottom line
 
-Rotation is available everywhere and costs nothing — try it first. Visible cloud
-motion requires scene geometry, not just a config edit, so it is a sky-authoring
-project rather than a patch. Full reasoning in `04_animated_skybox_options.md`.
+**The sky dome cannot be rotated or scrolled from a Lua mod.** Rotation exists in all
+225 environments but has no Lua handle; scrolling needs scene geometry and custom
+`dome_clouds` materials. Sweeping the four writable variables gives a slow colour
+wash, not movement. Full reasoning in `04_animated_skybox_options.md`, runtime evidence
+in `08_render_templates_shaders.md`.
 
 ---
 
@@ -159,6 +193,9 @@ Diesel Crate Browser export of
 | Environment key sets | 225 / 225 |
 | `underlay` sky binding | 223 / 225 (the 2 exceptions are the 2 Tier-2 files) |
 | Literal float constants | 2,210 slots, 575 distinct |
+| Live sky values | Probed in-game: `params_a`/`params_b` match static decoding exactly |
+| Lua-reachable sky controls | **4 variables** — `params_a`, `params_b`, `color0`, `color2` |
+| `sky_orientation/rotation` | **Not reachable from Lua** — C++-internal, see `08` |
 | Environment node/value block | **Partially decoded** — 40-byte descriptor table mapped, field semantics unknown, see `05` |
 
 ### Known gap: `units/` was never exported
