@@ -219,6 +219,10 @@ Goes **negative** on twilight skies, pushing the gradient band up the dome:
 **All 38 of 38 skies ship `1.0 1.0 1.0` for both** — zero exceptions. They are inert
 defaults, unused by the gradient, which `params_a` controls instead.
 
+The dome shader declares a **third** colour input, `ref_color1`, which **0 of 38**
+configs ever set. It is a free, permanently-default middle band. See
+`08_render_templates_shaders.md`.
+
 This is the variable set the existing mod's author probed and concluded the sky was
 static from. The conclusion was right; `color0`/`color2` just aren't where the live
 values live.
@@ -372,17 +376,23 @@ Only feature **1** works in 100% of environments.
 
 ---
 
-## Cross-check against the community wiki
+## Cross-check against the community wikis
 
-The Payday Wiki (2,036 pages) has **no skybox or environment article at all** — a
+The **Payday Wiki** (2,036 pages) has **no skybox or environment article at all** — a
 `Skybox` page is offered as a red link ("Create the page"). Its `Materials` article
 covers mask cosmetics, not engine materials. `PAYDAY 2 mods and tools` documents the
 Bundle Tool (extractor), Mod Tool, and mod overrides, and nothing about
 `material_config` or `.environment` formats.
 
-Every value in this document therefore comes from the binary export. There is no
-upstream documentation to check it against — which is why the verification method
-matters more than usual here.
+The **modworkshop wiki** was more useful. Its
+[Material Config XML](https://wiki.modworkshop.net/books/payday-2-mod-creation/page/material-config-xml)
+page points to `shaders/base.render_template_database` for the authoritative variable
+list. Following that pointer into `core/shaders/` produced the render template and
+shader findings in `08_render_templates_shaders.md`, including confirmation that the
+`uv_velocity_*`, `color_sun` and `alpha_scale_*` keys are real shader uniforms.
+
+Most values in this document come from the binary export. Where the community wikis
+cover the format at all, they cover `material_config` structure only.
 
 ---
 

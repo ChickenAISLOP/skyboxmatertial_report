@@ -38,6 +38,11 @@ parameter, no rotation handle. This is the hard ceiling.
 
 All 38 skies ship `color0` and `color2` as `1.0 1.0 1.0`. Both are inert.
 
+The dome shader actually declares **five** inputs — `params_a`, `params_b`, `color0`,
+`color1`, `color2` — and no sky config ever sets `color1`. There are also two further
+dome templates, `dome_clouds` and `dome_sun`, that exist and are compiled but are used
+by **zero** configs. See `08_render_templates_shaders.md`.
+
 ---
 
 ## Feature matrix

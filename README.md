@@ -18,6 +18,7 @@
 | `05_environment_binary_format.md` | Reverse engineering of the binary container + decoder |
 | `06_skybox_features.md` | **Feature spec sheet** — every feature, per-sky matrix, speed reference |
 | `07_feature_examples.md` | **One worked example per feature**, with real values |
+| `08_render_templates_shaders.md` | `dome_sky`/`dome_clouds`/`dome_sun`, shader inputs, the unused `color1` |
 
 ### Artifacts
 
@@ -128,6 +129,8 @@ Diesel Crate Browser export of
 | `aireportpd2/` (root) | 77 | ~0.1 MB |
 | **total** | **2,536** | **217.1 MB** |
 
+`units/` is **absent** from this export. See the known-gap note in *Data recovered*.
+
 ### Notes on the export
 
 - The **root-level** `*.material_config` files are a flat duplicate set, verified
@@ -151,10 +154,19 @@ Diesel Crate Browser export of
 |---|---|
 | Sky assets located | **38 skies** — 34 folders under `core/environments/skies` + 4 root-level configs |
 | `.material_config` schema | Fully read, plain XML |
+| Render templates | 3 dome templates declared, 1 used — see `08` |
+| Shader inputs | Recovered from DXBC reflection in `core/shaders/` |
 | Environment key sets | 225 / 225 |
 | `underlay` sky binding | 223 / 225 (the 2 exceptions are the 2 Tier-2 files) |
 | Literal float constants | 2,210 slots, 575 distinct |
 | Environment node/value block | **Partially decoded** — 40-byte descriptor table mapped, field semantics unknown, see `05` |
+
+### Known gap: `units/` was never exported
+
+The install is 31.66 GB across 98 `.crate` files; the export used here is 217 MB /
+2,536 files and has **no `units/` directory**. 14 `underlay` bindings point into
+`units/`, and three of those sky configs were never extracted — including
+`sky_1945_sunset_clouds_mex`. Details and how to close it in `08`.
 
 Everything except the node/value block's field semantics is verified directly from the
 export. The remaining gap is per-key numeric attribution inside that block. `coresky.lua`
