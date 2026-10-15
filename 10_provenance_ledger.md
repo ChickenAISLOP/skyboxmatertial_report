@@ -156,6 +156,52 @@ LuaJIT before shipping — end angle matches exactly at 30 / 60 / 90 / 144 / 240
 This works because nothing else competes for the value — see the 12-second watch above,
 spread 0.0000. A mod can own the rotation outright.
 
+## Brightness is not drivable — both routes measured dead
+
+Built, tested, and removed. The negative result is worth more than the control was.
+
+**Route 1 — the sky material. `set_variable` is a silent no-op.**
+
+| Time | Event |
+|---|---|
+| 14:09:29 | captured original sky intensity `0.1500` |
+| 14:09:29 | wrote `params_b.x` → `0.0697`, reported as success |
+| 14:09:30 | `params_b` reads back `0.1500` — **unchanged** |
+
+No error raised, `errors 0`, `writes 1`. The material returned by
+`Underlay:material()` is evidently not the live one the renderer reads. A call that
+reports success and does nothing is worse than one that raises, because it looks like
+it worked.
+
+This is the second confirmation that the retracted `Writable: yes` column was wrong.
+
+**Route 2 — the environment. The key only exists in 23% of environments.**
+
+The write route itself works. Verified:
+
+```
+14:12:21  others/sun_ray_color_scale 1.0000 -> 0.4028 (x0.40)  CONFIRMED
+```
+
+But the key that actually means sky intensity is `underlay_effect/sky_top/sky_intensity`,
+and our decode of all 225 environments shows where it lives:
+
+| Key | Coverage |
+|---|---|
+| `sky_intensity` | **51 / 225** — Tier 2 and 3 only |
+| | the other **174** are Tier 1 legacy: no sun model, no intensity key at all |
+
+`modders_devmap`, where this was tested, is Tier 1. All ten candidate paths correctly
+returned `no (false)`. That is not a naming problem and no path string fixes it.
+
+An intermediate revision made it look broken for the wrong reason: it fell through to
+`others/sun_ray_color_scale`, the only supported key on that level, which scales the
+**sun rays**. The write stuck, nothing looked different, and it read like a failure of
+the whole approach rather than a bad fallback.
+
+**Removed.** A control that works on 23% of levels is worse than none, because it looks
+functional.
+
 ## Provenance tiers
 
 | Tier | Meaning |
@@ -210,7 +256,7 @@ Dome visibly rotated and returned (user-confirmed video).
 | **Nothing animates the rotation in a heist** | **1** | 24 samples over 12s on `branchbank`, spread **0.0000**, both viewports agreeing |
 | Rotation survives a level change without a fight | 1 | implied by the above — no competing writer exists |
 | 4 sky-material variables **exist and are readable** | 1 | live probe; values match static decode |
-| Those 4 variables are **writable** | **4** | **inference from `variable_exists`. No `set_variable` call had been made when this was claimed.** See below |
+| Those 4 variables are **writable** | **1 — refuted** | **`set_variable` measured as a silent no-op: wrote 0.0697, read back 0.1500, no error.** See below |
 | `_set_environment` callable | 1 | live call returned without raising |
 | Environment DB path form `environments/<dir>/<name>` | 1 | 5/5 candidates returned `YES` |
 | Environment swap changes the rendered sky | **4** | **not demonstrated, and not safely testable** — both routes access-violate through BeardLib's `FileManager:Process` |
