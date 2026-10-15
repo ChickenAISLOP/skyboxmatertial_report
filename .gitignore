@@ -1,0 +1,16 @@
+# Raw Diesel Crate Browser export of PAYDAY 2 assets.
+# Ripped Overkill / Starbreeze content - not redistributed here.
+# Regenerate locally with Diesel Crate Browser; see 05_environment_binary_format.md
+aireportpd2/
+
+# Large decoder outputs - regenerate with:
+#   .\tools\decode_environment.ps1 -Path <export>\environments -Recurse -JsonOut decoded\environments.json
+decoded/environments.json
+decoded/environment_summary.csv
+
+# OS / editor noise
+Thumbs.db
+desktop.ini
+.DS_Store
+*.tmp
+*~
