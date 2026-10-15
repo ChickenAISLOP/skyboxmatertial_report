@@ -8,7 +8,7 @@ cannot move, and leaves four layers that can completely untouched.
 
 | Layer | Animatable | Coverage | Effort |
 |---|---|---|---|
-| Dome cubemap (`dome_sky`) | **No** | 34 skies | — |
+| Dome cubemap (`dome_sky`) | **No** | 38 skies | - |
 | Cloud layers (`DIFFUSE0_UVANIM` + `uv0_speed`) | **Yes** | 1 sky vanilla, extensible to any | Medium |
 | Dome rotation (`sky_orientation.rotation`) | **Yes** | **225 / 225 environments** | **Low** |
 | Sun animation (`sun_anim`, `sun_anim_x`) | **Yes** | **49 / 225 (Tier 3 only)** | Low |
@@ -36,13 +36,14 @@ no sun model there to animate.
 
 Three independent confirmations that `dome_sky` has no animation:
 
-1. **All 33 named sky configs** use `render_template="dome_sky"`, and `dome_sky`
+1. **All 38 sky configs** use `render_template="dome_sky"`, and `dome_sky`
    exposes only `params_a` (range/offset/curve), `params_b` (sky intensity/sun
    intensity), and legacy `color0`/`color2`. No scroll parameter exists.
 2. **`mods/environment editor/env.lua`** reads the live material and enumerates the
    variables: `color0`, `color0_scale`, `color2`, `color2_scale`. That is the whole
-   set.
-3. **`02_sky_material_configs.md`** — `uv0_speed` appears in exactly 4 configs
+   set. *(This mod is not in the asset export — no `mods/` folder exists in
+   `aireportpd2/`. Community description, not verified against a file here.)*
+3. **`02_sky_material_configs.md`** - `uv0_speed` appears in exactly 4 configs
    game-wide, none of them `dome_sky`.
 
 The mod's own header comment states this correctly. The diagnosis was right; the
@@ -237,7 +238,5 @@ Option C is a cheap add-on to A for outdoor levels.
 | `core/environments/skies/<sky>/<sky>.material_config` | Per-sky material definition |
 | `core/environments/skies/<sky>/<sky>.scene` | Scene graph — where cloud meshes would live |
 | `environments/<name>/<name>.environment` | Environment: `underlay`, `sky_orientation`, sun, flares |
-| `core/lib/managers/coresky.lua` | `CoreSky` param tree, `interpolate`, `LightIntensityDB` |
+| `core/lib/managers/coresky.lua` | `CoreSky` param tree, `interpolate`, `LightIntensityDB`, `set_value` |
 | `core/lib/managers/viewport/interfaces/coreenvironmentskyorientationinterface` | Orientation interface |
-| `mods/Scrolling Textures/lua/generator/configs.lua` | Working UV-scroll implementation, `DB:open` pattern |
-| `mods/environment editor/env.lua` | Live variable enumeration of the sky material |

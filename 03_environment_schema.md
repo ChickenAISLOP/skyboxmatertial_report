@@ -403,8 +403,11 @@ Reading that:
 - `string_to_vector` / `string_is_good_vector` — env values are parsed from strings.
 
 `coresky.lua` is 1,898 bytes of serialized data — small, it is a schema interpreter
-rather than logic. `CoreSky` likely takes the same param tree the `.environment` file
-carries and exposes it to Lua, which is how `Environment Editor` reads `color0`/`color2`.
+rather than logic. It exports as **LuaJIT bytecode** (`1B 4C 4A`), so the source is
+unreadable, but its string table confirms the interface: `class.CoreSky`,
+`set_value`, `database_lookup`, `LightIntensityDB`, `interpolate`, `Vector3` with
+`z.y.x`, and a `param`/`key`/`value`/`children` tree. That matches the node structure in
+the `.environment` files, so `CoreSky` takes the same param tree and exposes it to Lua.
 
 ---
 
@@ -454,5 +457,6 @@ A 40-byte descriptor table inside it has been mapped, but its field semantics ar
 resolved. The block also carries the distance-type parameters (fog ranges, cascaded
 shadow slice depths), which are not in the float pool.
 
-For exact numbers on those, read them live in-game — the Environment Editor mod
-already surfaces several, and `coresky` exposes `interpolate` and `database_lookup`.
+For exact numbers on those, read them live in-game. `coresky`'s string table exposes
+`set_value`, `interpolate` and `database_lookup` against `Global.level_data`, which is
+enough to read or write any key without further binary work.

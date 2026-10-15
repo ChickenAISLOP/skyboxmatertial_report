@@ -45,6 +45,11 @@ The gradient is baked per-sky via `params_a`. This is a hard ceiling, not a mod 
 
 ### What the `Environment Editor` mod exposes
 
+> **Provenance:** the mod itself is **not** in this asset export — there is no `mods/`
+> folder in `aireportpd2/`. The snippet below is from community description of that
+> mod, not verified against a file here. Treat it as a lead, not a finding. Everything
+> else in this document was read directly from the export.
+
 `mods/environment editor/env.lua` reads this exact material and finds only:
 
 ```lua
@@ -62,8 +67,9 @@ confirmation from a third source.
 
 ## Full `params_a` / `params_b` table
 
-| Sky | params_a (range, offset, curve) | params_b (sky int, sun int, —) |
+| Sky | params_a (range, offset, curve) | params_b (sky int, sun int, -) |
 |---|---|---|
+| `default` | `0.9 0.5 2.0` | `0.15 1 0` |
 | `sky_0200_night_moon_stars` | `1 0.05 1.2` | `0.5 0.5 0` |
 | `sky_0902_overcast` | `1 0.0 1.0` | `0.25 0.5 0` |
 | `sky_0902_overcast_dark` | `1 0.0 1.0` | `0.25 0.5 0` |
@@ -72,6 +78,7 @@ confirmation from a third source.
 | `sky_1044_overcast_sun` | `1 0.0 1.0` | `0.25 0.5 0` |
 | `sky_1224_clear_sky` | `1 0.0 1.0` | `0.25 0.5 0` |
 | `sky_1313_cloudy` | `1 0.0 1.0` | `0.25 0.5 0` |
+| `sky_1313_cloudy_dark` | `1 0.0 1.0` | `0.25 0.5 0` |
 | `sky_1345_clear_sky` | `1 0.0 1.0` | `0.25 0.5 0` |
 | `sky_1345_clear_sky_mountain_01` | `1 0.0 1.0` | `0.25 0.5 0` |
 | `sky_1530_low_sun_clouds` | `1 0.0 1.0` | `0.25 0.5 0` |
@@ -81,7 +88,7 @@ confirmation from a third source.
 | `sky_1930_twillight` | `1 0.0 1.0` | `0.25 0.5 0` |
 | `sky_1931_low_sun` | `1.0 0.0 1.0` | `0.25 1 0` |
 | `sky_1945_sunset` | `1 0.0 1.0` | `0.25 0.5 0` |
-| **`sky_1945_sunset_clouds`** | **`0.2 0.0 0.1`** | `0.25 0.5 0` |
+| **`sky_1945_sunset_clouds`** | **`0.2 0.0 0.1`** | **`0.25 0.5 0`** |
 | `sky_2000_twilight_mad` | `1 0.0 1.0` | `0.25 0.5 0` |
 | `sky_2003_dusk_blue` | `1.0 -0.09 1.5` | `0.25 1 0` |
 | `sky_2003_dusk_blue_high_color_scale` | `1 0.0 1.0` | `0.25 0.5 0` |
@@ -92,7 +99,8 @@ confirmation from a third source.
 | `sky_279_dusk` | `1 0.0 1.0` | `0.1 0.5 0` |
 | `sky_city_clear` | `1 0.0 1.0` | `0.25 0.5 0` |
 | `sky_city_clear_high` | `1 0.0 1.0` | `0.25 0.5 0` |
-| **`sky_cloudy_blue`** | **`0.9 0.5 2.0`** | `0.15 1 0` |
+| **`sky_cloudy_blue`** | **`0.9 0.5 2.0`** | **`0.15 1 0`** |
+| `sky_corp_deep_blue` | `1 0.0 1.0` | `0.1 0.5 0` |
 | `sky_csgo_de_bank_cs15_daylight02` | `1 0.0 1.0` | `0.25 0.5 0` |
 | `sky_dah_night` | `1 -0.09 1.5` | `0.25 0.5 0` |
 | `sky_pent_dusk_0065` | `1 0.0 1.0` | `0.1 0.5 0` |

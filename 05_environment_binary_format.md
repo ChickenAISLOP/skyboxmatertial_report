@@ -304,16 +304,19 @@ any attribution would be guesswork dressed as data.
 
 ### Get the numbers in-game instead
 
-Far cheaper and exact. `mods/environment editor/env.lua` already reads live values off
-the running environment — `sky_color_top`, `sky_color_top_scale`, `sky_color_bottom`,
-`sky_color_bottom_scale` — and renders them in a menu. `coresky.lua` exposes
-`interpolate` and `database_lookup`, so extending it to dump any other key is a few
-lines. Roughly an hour of work versus days of binary RE for the same numbers.
+Far cheaper and exact. `coresky.lua` exports as LuaJIT bytecode, but its string table
+exposes `set_value`, `interpolate` and `database_lookup` against `Global.level_data` —
+enough to read or write any environment key at runtime. Dumping a key is then a few
+lines of Lua rather than more binary work. Roughly an hour of work versus days of
+binary RE for the same numbers.
+
+Note there is **no `mods/` folder in the asset export**, so community tooling like the
+Environment Editor mod could not be checked here.
 
 ### If you continue the RE
 
-1. Validate against a file whose values are known — launch a level with the
-   Environment Editor open and diff against the corresponding `.environment`.
+1. Validate against a file whose values are known — read the live value in-game and
+   diff against the corresponding `.environment`.
 2. Start from a Tier-1 file (28 keys, 1.8 KB block).
 3. Use the colour triples as anchors: they are unambiguously float32 and their count
    equals the number of colour params.

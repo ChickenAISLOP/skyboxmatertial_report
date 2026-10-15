@@ -11,18 +11,21 @@
 
 | File | Contents |
 |---|---|
-| `01_sky_inventory.md` | All 34 sky assets, exact paths, which are actually used |
+| `01_sky_inventory.md` | All 38 skies, exact paths, which are actually used |
 | `02_sky_material_configs.md` | `dome_sky` schema, `params_a`/`params_b`, the `DIFFUSE0_UVANIM` + `uv0_speed` mechanism |
 | `03_environment_schema.md` | `.environment` schema, the three tiers, full key list, sky→environment map |
 | `04_animated_skybox_options.md` | The three animation routes, effort vs payoff, why the current mod stalls |
 | `05_environment_binary_format.md` | Reverse engineering of the binary container + decoder |
 | `06_skybox_features.md` | **Feature spec sheet** — every feature, per-sky matrix, speed reference |
+| `07_feature_examples.md` | **One worked example per feature**, with real values |
 
 ### Artifacts
 
 | Path | Contents | Published |
 |---|---|---|
 | `tools/decode_environment.ps1` | Working `.environment` decoder | yes |
+| `decoded/sky_inventory.csv` | All 38 skies: params, materials, UV layers, env bindings | yes |
+| `decoded/environment_keys.csv` | Every environment key with per-tier coverage (178 keys) | yes |
 | `decoded/environments.json` | Full dump of all 225 (7.2 MB) | no — regenerate |
 | `decoded/environment_summary.csv` | `underlay`, `global_texture`, literal pool floats (79 KB) | no — regenerate |
 | `aireportpd2/` | Raw asset export, 2,536 files / 217 MB | no — game assets |
@@ -146,7 +149,7 @@ Diesel Crate Browser export of
 
 | Item | Coverage |
 |---|---|
-| Sky assets located | 34 / 34 folders, every file enumerated |
+| Sky assets located | **38 skies** — 34 folders under `core/environments/skies` + 4 root-level configs |
 | `.material_config` schema | Fully read, plain XML |
 | Environment key sets | 225 / 225 |
 | `underlay` sky binding | 223 / 225 (the 2 exceptions are the 2 Tier-2 files) |
@@ -154,5 +157,7 @@ Diesel Crate Browser export of
 | Environment node/value block | **Partially decoded** — 40-byte descriptor table mapped, field semantics unknown, see `05` |
 
 Everything except the node/value block's field semantics is verified directly from the
-export. The remaining gap is per-key numeric attribution inside that block, which is
-cheaper to get in-game via the Environment Editor mod than by further binary work.
+export. The remaining gap is per-key numeric attribution inside that block. `coresky.lua`
+exports as LuaJIT bytecode, but its string table exposes `class.CoreSky` with
+`database_lookup`, `interpolate`, `set_value` and `LightIntensityDB` — enough to read
+any key's live value in-game, which is cheaper than further binary work.
