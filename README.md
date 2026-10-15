@@ -18,7 +18,7 @@ existing mod was patching.
 
 | File | Contents |
 |---|---|
-| `01_sky_inventory.md` | All 38 skies, exact paths, which are actually used |
+| `01_sky_inventory.md` | All 40 skies, exact paths, which are actually used |
 | `02_sky_material_configs.md` | `dome_sky` schema, `params_a`/`params_b`, the `DIFFUSE0_UVANIM` + `uv0_speed` mechanism |
 | `03_environment_schema.md` | `.environment` schema, the three tiers, full key list, sky→environment map |
 | `04_animated_skybox_options.md` | The three animation routes, effort vs payoff, why the current mod stalls |
@@ -34,7 +34,7 @@ existing mod was patching.
 | Path | Contents | Published |
 |---|---|---|
 | `tools/decode_environment.ps1` | Working `.environment` decoder | yes |
-| `decoded/sky_inventory.csv` | All 38 skies: params, materials, UV layers, env bindings | yes |
+| `decoded/sky_inventory.csv` | All 40 skies: params, materials, UV layers, env bindings | yes |
 | `decoded/environment_keys.csv` | Every environment key with per-tier coverage (178 keys) | yes |
 | `decoded/environments.json` | Full dump of all 225 (7.2 MB) | no — regenerate |
 | `decoded/environment_summary.csv` | `underlay`, `global_texture`, literal pool floats (79 KB) | no — regenerate |
@@ -250,7 +250,7 @@ Diesel Crate Browser export of
 | `aireportpd2/` (root) | 77 | ~0.1 MB |
 | **total** | **2,536** | **217.1 MB** |
 
-`units/` is **absent** from this export. See the known-gap note in *Data recovered*.
+`units/` is present — 160,660 files. See *`units/` is now exported* in *Data recovered*.
 
 ### Notes on the export
 
@@ -273,7 +273,8 @@ Diesel Crate Browser export of
 
 | Item | Coverage |
 |---|---|
-| Sky assets located | **38 skies** — 34 folders under `core/environments/skies` + 4 root-level configs |
+| Sky assets located | **40 skies** — 34 folders under `core/environments/skies` + 4 root-level configs + 2 DLC skies found in `units/` (see below) |
+| `units/` tree | **160,660 files** across ~240 DLC directories, integrity checked |
 | `.material_config` schema | Fully read, plain XML |
 | Render templates | 3 dome templates declared, 1 used — see `08` |
 | Shader inputs | Recovered from DXBC reflection in `core/shaders/` |
@@ -286,12 +287,108 @@ Diesel Crate Browser export of
 | `sky_orientation/rotation` | **Drivable from Lua** via `_env_handler:editor_set_value` — corrected |
 | Environment node/value block | **Partially decoded** — 40-byte descriptor table mapped, field semantics unknown, see `05` |
 
-### Known gap: `units/` was never exported
+### Two more skies, from the DLC units
 
-The install is 31.66 GB across 98 `.crate` files; the export used here is 217 MB /
-2,536 files and has **no `units/` directory**. 14 `underlay` bindings point into
-`units/`, and three of those sky configs were never extracted — including
-`sky_1945_sunset_clouds_mex`. Details and how to close it in `08`.
+`units/` also closed the last outstanding asset gap. Both previously-missing skies
+are in the Mexico DLC, at `units/pd2_dlc_mex/environments/`:
+
+| Sky | Files | Note |
+|---|---|---|
+| `sky_1945_sunset_clouds_mex` | 13 | layered, **three cloud materials** |
+| `sky_1945_sunset_mex` | 4 | plain |
+
+`sky_1945_sunset_clouds_mex` is the interesting one — it is a second instance of the
+only layered sky in the game, with its **own separate cloud textures**:
+
+```
+top_clouds_df.dds             262,272 b
+stormy_clouds_02_df.dds      2,097,280 b
+stormy_clouds_02_lit_df.dds  2,097,280 b
+stormy_clouds_df.dds           262,272 b
+stormy_clouds_lit_df.dds     1,048,704 b
+stormy_dark_clouds_df.dds     524,416 b
+top_clouds_dark_df.dds      5,592,560 b
+```
+
+Its three `uv0_speed` values are **identical** to the vanilla
+`sky_1945_sunset_clouds`:
+
+```
+clouds_top      0  -0.0060000000521541  0
+clouds_02       0   0.0049999998882413  0
+clouds_02_slow  0   0.0029999988619238  0
+```
+
+So the cloud scroll setup is copy-pasted wholesale between the two — same speeds, same
+float32 representation, same four material names. The mex variant differs only in
+texture content and in having a separate `_lit` / `_dark` pair for day/night variants.
+
+This raises the count from 38 to **40 skies**. It also confirms `params_b` is
+`0.25 0.5 0` in the authored file for both, whereas the live dev-map probe reads
+`0.15 1.0 0` — the environment overrides it at load, which is consistent with what
+`03_environment_schema.md` documents about environment parameters winning.
+
+### `units/` is now exported — gap closed
+
+**This gap note is obsolete.** `units/` arrived after the documents were written and
+holds **160,660 files** across ~240 DLC directories. Verified:
+
+| Extension | Count | Zero-byte |
+|---|---|---|
+| `.dds` | 39,321 | — |
+| `.unit` | 24,621 | 0 |
+| `.model` | 23,484 | 0 |
+| `.object` | 23,441 | 0 |
+| `.material_config` | 22,390 | 0 |
+| `.cooked_physics` | 23,434 | 20,249 |
+
+No `.unit`, `.model`, `.object` or `.material_config` is empty, and a 400-file sample
+found only 8 `.unit` files without a sibling `.model`. The zero-byte
+`.cooked_physics` are expected: **86%** of them, while 3,185 have real content ranging
+from ~700 bytes upward. Static geometry ships no collision hull.
+
+**The dome geometry was in there all along.** `units/payday2/architecture/skydomes/`
+(the same seven files also appear at the export root as `skydomes/`):
+
+```
+skydome_quick_diamond.unit              233 b
+skydome_quick_diamond.object            246 b
+skydome_quick_diamond.material_config   403 b
+skydome_quick_diamond.model            4915 b
+skydome_quick_diamond_df.dds       2796344 b
+sky_il_df.dds                           312 b
+```
+
+The `.unit` places it, and the `.object` names its orientation:
+
+```xml
+<unit slot="1" type="str">
+    <object file="units/payday2/architecture/skydomes/skydome_quick_diamond"/>
+```
+
+```xml
+<dynamic_object>
+    <diesel materials="units/payday2/architecture/skydomes/skydome_quick_diamond"
+             orientation_object="rp_skydome_quick_diamond"/>
+```
+
+**The dome uses a different render template from the sky.** Worth noting, because it
+explains why rotation is an *orientation* and not a UV offset:
+
+```
+<material name="sky"
+          render_template="generic:DIFFUSE_TEXTURE:RL_BACKDROP:SELF_ILLUMINATION">
+```
+
+That is `RL_BACKDROP`, not `dome_sky`. The dome is a backdrop with self-illumination;
+`sky_orientation/rotation` drives the orientation object `rp_skydome_quick_diamond`, so
+the whole dome turns as a rigid body. That is why the clouds baked into the texture
+rotate with it, and why `sky_1945_sunset_clouds` — whose clouds are separate dome
+materials with their own `uv0_speed` — is the case where rotation is the wrong tool.
+
+The `.model` is binary: `DODB` magic, version 1, and an embedded build path
+`D:/projects/payday2_source/architecture/skydomes/skydome_quick_diamond.mb`. Vertex
+data is present but not decoded here.
 
 Everything except the node/value block's field semantics is verified directly from the
 export. The remaining gap is per-key numeric attribution inside that block. `coresky.lua`

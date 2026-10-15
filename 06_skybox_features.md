@@ -3,7 +3,7 @@
 Spec sheet for every skybox feature in PAYDAY 2, written in the same style as a
 `material_config`. Everything below is read directly from the exported assets.
 
-Scope: **38 skies** (content-filtered on `render_template="dome_sky"`), **225
+Scope: **40 skies** (content-filtered on `render_template="dome_sky"`), **225
 environments**.
 
 ---
@@ -36,7 +36,7 @@ This is the complete feature surface of the stock sky, expressed as a material:
 **Six variables. None of them animate.** `dome_sky` has no `uv_speed`, no scroll
 parameter, no rotation handle. This is the hard ceiling.
 
-All 38 skies ship `color0` and `color2` as `1.0 1.0 1.0`. Both are inert.
+All 40 skies ship `color0` and `color2` as `1.0 1.0 1.0`. Both are inert.
 
 The dome shader actually declares **five** inputs — `params_a`, `params_b`, `color0`,
 `color1`, `color2` — and no sky config ever sets `color1`. There are also two further
@@ -53,13 +53,13 @@ by **zero** configs. See `08_render_templates_shaders.md`.
 | 2 | **Cloud scroll** | `DIFFUSE0_UVANIM` + `uv0_speed` | **Yes** | 1 sky vanilla, extensible |
 | 3 | **Sun animation** | `sun_anim`, `sun_anim_x` | **Yes** | 49 / 225 envs |
 | 4 | **Lens flare animation** | `flare_anim_x`, `flare_anim_y` | **Yes** | 49 / 225 envs |
-| 5 | Sky brightness | `params_b.x` | No | 38 skies |
-| 6 | Sun disc on/off | `params_b.y` = 0.5 / 1 | No | 38 skies (6 with a disc) |
-| 7 | Gradient spread | `params_a.x` | No | 38 skies |
-| 8 | Gradient offset | `params_a.y` | No | 38 skies |
-| 9 | Gradient curve | `params_a.z` | No | 38 skies |
-| 10 | Sky top colour | `color0` | No | 38 / 38 (all default) |
-| 11 | Sky bottom colour | `color2` | No | 38 / 38 (all default) |
+| 5 | Sky brightness | `params_b.x` | No | 40 skies |
+| 6 | Sun disc on/off | `params_b.y` = 0.5 / 1 | No | 40 skies (6 with a disc) |
+| 7 | Gradient spread | `params_a.x` | No | 40 skies |
+| 8 | Gradient offset | `params_a.y` | No | 40 skies |
+| 9 | Gradient curve | `params_a.z` | No | 40 skies |
+| 10 | Sky top colour | `color0` | No | 40 / 40 (all default) |
+| 11 | Sky bottom colour | `color2` | No | 40 / 40 (all default) |
 | 12 | Sky cubemap swap | `underlay` | n/a | 223 / 225 recovered |
 | 13 | Sun colour (both sides) | `color_sun`, `color_opposite_sun` | Tier 3 | 49 envs (`sun_range` 34) |
 | 14 | Volumetric sun rays | `sun_ray_color`, `sun_ray_color_scale` | all tiers | **225 / 225** |
@@ -82,7 +82,7 @@ means the key is missing from part of Tier 3 - see `07` for the per-key breakdow
 
 ## Per-sky feature table
 
-All **38** skies, selected by content filter (`render_template="dome_sky"`).
+All **40** skies, selected by content filter (`render_template="dome_sky"`).
 `Mats` = material count, `UV` = scrolling layers, `Envs` = environments binding it.
 
 | Sky | Mats | `params_a` range,offset,curve | `params_b` sky,sun | UV | Envs |
@@ -140,7 +140,7 @@ in its own folder with the wrong filename. Identify skies by folder, not filenam
 
 ### `params_b.y` — sun disc
 
-`1` = visible sun disc, `0.5` = no sun. Six of 38:
+`1` = visible sun disc, `0.5` = no sun. Six of 40:
 
 ```
 default                  sky_cloudy_blue      sky_1931_low_sun
@@ -186,7 +186,7 @@ band up the dome.
 | `default` | Same shape as `sky_cloudy_blue` — it is the fallback sky |
 | `skydome_quick_diamond` | No `dome_sky`. Interior backdrop: `generic:DIFFUSE_TEXTURE:RL_BACKDROP:SELF_ILLUMINATION` |
 
-`skydome_quick_diamond` is excluded from the 38 — it is not a sky dome.
+`skydome_quick_diamond` is excluded from the 40 - it is not a sky dome. See the `units/` note in `README`.
 
 ---
 

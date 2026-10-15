@@ -1,6 +1,6 @@
 # 02 — Sky Material Configs
 
-39 `sky*.material_config` files were recovered, plus 38 more non-sky configs.
+84 `sky*.material_config` files exist, of which 77 declare `render_template="dome_sky"` and resolve to 40 distinct skies.
 All are plain XML and read directly.
 
 ---

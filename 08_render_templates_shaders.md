@@ -65,7 +65,7 @@ Plus 7 `.post_processor` files describing the full post stack.
 
 | Template | Used by |
 |---|---|
-| `dome_sky` | **70** configs (38 distinct skies) |
+| `dome_sky` | **78** configs (40 distinct skies) |
 | `dome_clouds` | **0** |
 | `dome_sun` | **0** |
 
@@ -155,7 +155,7 @@ Every sky config declares only `color0` and `color2`:
 <variable name="color2" type="vector3" value="1.0 1.0 1.0"/>
 ```
 
-**0 of 38** sky configs declare `color1`. That is consistent with `params_a` shaping
+**0 of 40** sky configs declare `color1`. That is consistent with `params_a` shaping
 the gradient across the dome: a three-stop gradient would want a mid colour, and the
 engine reserves one but the art never fills it.
 
@@ -353,7 +353,7 @@ This matters concretely. 14 of the 223 `underlay` bindings point into `units/`:
 | 1 | `units/pd2_dlc_mex/environments/sky_1945_sunset_clouds_mex` |
 
 All three are referenced by vanilla environments. **None were extracted.** Two of them
-(`sky_pent_dusk_0065`, `sky_corp_deep_blue`) were counted in the 38-sky inventory only
+(`sky_pent_dusk_0065`, `sky_corp_deep_blue`) were counted in the 40-sky inventory only
 because flat duplicate copies exist at the export root.
 
 `sky_1945_sunset_clouds_mex` — a **Minecraft-themed variant of the one animated sky** —

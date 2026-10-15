@@ -6,7 +6,7 @@ read from the exported assets.
 Legend: **decoded** = value recovered · **key only** = key recovered, value lives in
 the undecoded node/value block (see `05`)
 
-Scope: **38 skies**, **225 environments**. Both re-derived by content filter, not path
+Scope: **40 skies**, **225 environments**. Both re-derived by content filter, not path
 filter — see *Corrections* at the end.
 
 ---
@@ -143,7 +143,7 @@ flare_color        flare_name
 
 # The non-animatable sky variables — all decoded
 
-Real values, straight from the configs. Counts are over **38 skies**.
+Real values, straight from the configs. Counts are over **40 skies**.
 
 ## 5. Sky brightness — `params_b.x`
 
@@ -170,7 +170,7 @@ between `0.25` and `0.5`.
 <variable name="params_b" type="vector3" value="0.25 0.5 0"/> <!-- no sun -->
 ```
 
-**6 of 38** skies have a sun disc; the other 32 use `0.5`:
+**6 of 40** skies have a sun disc; the other 34 use `0.5`:
 
 ```
 default        sky_cloudy_blue   sky_1931_low_sun
@@ -181,7 +181,7 @@ All six are daylight or low-sun skies. Every twilight and night sky uses `0.5`.
 
 ## 7. Gradient spread — `params_a.x`
 
-`1` for **35 of 38** skies (31 write `1`, 4 write `1.0` — same value). Outliers:
+`1` for most skies, with `params_a.x` at `1` in **32 of 40**. Outliers:
 
 | Value | Sky |
 |---|---|
@@ -222,7 +222,7 @@ Goes **negative** on twilight skies, pushing the gradient band up the dome:
 <variable name="color2" type="vector3" value="1.0 1.0 1.0"/>   <!-- sky bottom -->
 ```
 
-**All 38 of 38 skies ship `1.0 1.0 1.0` for both** in the config file. That is the
+**All 40 of 40 skies ship `1.0 1.0 1.0` for both** in the config file. That is the
 *static* value.
 
 At runtime it is a different number. Live probe of `modders_devmap`:
@@ -423,7 +423,7 @@ methodology bugs:
 
 1. **Path filter instead of content filter.** Skies were selected by directory name
    matching `environments.skies|skydomes`, which silently excluded every root-level
-   config. Content-filtering on `render_template="dome_sky"` gives **38** skies, not 34.
+   config. Content-filtering on `render_template="dome_sky"` gives **40** skies, not 34.
 2. **Name collisions.** `sky_1313_cloudy` and `sky_1313_cloudy_dark` are two distinct
    skies whose config files are **both** named `sky_1313_cloudy.material_config` —
    the dark one's sits in its own folder with the wrong filename. Deduping by filename
@@ -431,16 +431,16 @@ methodology bugs:
 
 | Claim | Was | Now |
 |---|---|---|
-| Sky count | 34 | **38** |
+| Sky count | 34 | **40** |
 | `params_b.x = 0.25` | 25 skies | **32** |
 | `params_b.x = 0.1` | 2 skies | **3** (`sky_corp_deep_blue` missing) |
-| `params_a.x = 1` | 32 of 34 | **35 of 38** |
+| `params_a.x = 1` | 32 of 34 | **32 of 40** |
 | `params_a.y = 0.0` | 26 skies | **30** |
 | `params_a.z = 1.0` | 23 skies | **28** |
 | `sun_range` coverage | 49 | **34** |
 | `sky_intensity` coverage | 49 | **51** |
 | Skies with a sun disc | 6 | 6 (unchanged) |
-| Skies with `color0`/`color2` | "every sky" | **38 / 38**, verified |
+| Skies with `color0`/`color2` | "every sky" | **40 / 40**, verified |
 
 Every row of `decoded/sky_inventory.csv` was re-derived from its config file after
 generation and verified field by field: **0 mismatches**, env bindings sum to 223,

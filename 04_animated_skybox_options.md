@@ -8,7 +8,7 @@ cannot move, and leaves four layers that can completely untouched.
 
 | Layer | Animatable | Coverage | Effort |
 |---|---|---|---|
-| Dome cubemap (`dome_sky`) | **No** | 38 skies | - |
+| Dome cubemap (`dome_sky`) | **No** | 40 skies | - |
 | Cloud layers (`DIFFUSE0_UVANIM` + `uv0_speed`) | **Yes** | 1 sky vanilla, extensible to any | Medium |
 | Dome rotation (`sky_orientation.rotation`) | **Yes** | **225 / 225 environments** | **Low** |
 | Sun animation (`sun_anim`, `sun_anim_x`) | **Yes** | **49 / 225 (Tier 3 only)** | Low |
@@ -38,7 +38,7 @@ reachable from a mod; rotation is the cheapest and the most universal.
 
 Three independent confirmations that `dome_sky` has no animation:
 
-1. **All 38 sky configs** use `render_template="dome_sky"`, and `dome_sky`
+1. **All 40 sky configs** use `render_template="dome_sky"`, and `dome_sky`
    exposes only `params_a` (range/offset/curve), `params_b` (sky intensity/sun
    intensity), and legacy `color0`/`color2`. No scroll parameter exists.
 2. **`mods/environment editor/env.lua`** reads the live material and enumerates the
