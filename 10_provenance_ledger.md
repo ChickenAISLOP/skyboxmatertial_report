@@ -244,6 +244,35 @@ Two concrete faults:
 
 Dome visibly rotated and returned (user-confirmed video).
 
+## The shadow-freeze correction (2026-10-25)
+
+The dome rotation also rotates the sun, because the global shadow-casting light is
+linked to `d_sun`, a child of `rp_skydome`:
+
+```lua
+Global._global_light = World:create_light("directional|specular")
+Global._global_light:link(Underlay:get_object(Idstring("d_sun")))
+World:set_global_shadow_caster(Global._global_light)
+```
+
+The first implementation captured `Light:rotation()` and wrote it back with
+`Light:set_rotation()`. It froze the shadow but darkened the level. The captured value
+was the light's **local** rotation, not its world rotation: live logs recorded
+`local yaw 0.00` while the parent dome was at `63.89`. Assigning that to world space
+pointed the sun away from the level.
+
+**Corrected and user-confirmed in-game:** hold the world direction in parent space.
+
+```lua
+local world = parent:rotation() * light:local_rotation()
+light:set_local_rotation(parent:rotation():inverse() * world)
+```
+
+`shadow_freeze.lua` captures the world angle when rotation starts, applies the formula
+every frame, and recaptures when the engine replaces the light or a level loads. It has
+no menu tab or toggle; it is always on while the sky rotation driver runs. The raw log
+is `evidence/shadow_freeze.log`.
+
 ## Current claim status
 
 | Claim | Tier | How verified |
@@ -255,6 +284,9 @@ Dome visibly rotated and returned (user-confirmed video).
 | `_environment_modifier_id` == rotation key hash | 1 | live probe, value `3c084f67b1da34be` |
 | **Nothing animates the rotation in a heist** | **1** | 24 samples over 12s on `branchbank`, spread **0.0000**, both viewports agreeing |
 | Rotation survives a level change without a fight | 1 | implied by the above — no competing writer exists |
+| Shadow-casting light follows the rotating dome | 1 | source: global light is linked to `d_sun`, a child of `rp_skydome` |
+| Linked `Light:rotation()` returns **world** space | **4 — refuted** | live capture: light yaw `0.00` while parent yaw `63.89` |
+| Shadow can be held static while the dome rotates | **1** | user-confirmed in-game 2026-10-25; parent-space capture in `evidence/shadow_freeze.log`; 36-case harness |
 | 4 sky-material variables **exist and are readable** | 1 | live probe; values match static decode |
 | Those 4 variables are **writable** | **1 — refuted** | **`set_variable` measured as a silent no-op: wrote 0.0697, read back 0.1500, no error.** See below |
 | `_set_environment` callable | 1 | live call returned without raising |
@@ -305,3 +337,5 @@ Dome visibly rotated and returned (user-confirmed video).
 | 6 | `uv_velocity_*` flat key | full path `underlay_effect/cloud_overlay/uv_velocity_*` |
 | 7 | rotation unreachable from Lua | **reachable — see above** |
 | 8 | "the dome never rotates" | it rotates via `sky_orientation/rotation` |
+| 9 | "freezing the shadow means removing it" | the shadow can stay static; hold the linked light's world rotation in parent space |
+| 10 | `Light:rotation()` on the linked global light is world-space | it returns local rotation (`yaw 0.00` while the parent was at `63.89`); use `parent:rotation()` |

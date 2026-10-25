@@ -18,8 +18,10 @@ That is the point — the negative results are what took the work to establish.
 | `sky_probe_report.txt` | sky internals | The four readable material variables and their live values. |
 | `env_swap_report.txt` | environment API | `game_default_environment()` returns `core/environments/default`; the five candidate DB paths all return `YES`. |
 | `cloud_report.txt` | cloud layers | `Underlay:material()` returns `nil` for `clouds_top` / `clouds_02` / `clouds_02_slow` on a level not using `sky_1945_sunset_clouds`. |
+| `shadow_freeze.log` | shadow freeze | Pre-fix captures show `yaw 0.00`; post-fix lines show the linked light's `parent yaw` changing while `local yaw` stays `0.00`. |
+| `probes/` | probe source | Seven Lua modules used for the measurements, removed from the shipped mod. |
 
-## The two that matter most
+## The files that matter most
 
 **`sky_brightness.log`** is why brightness was removed. `mat:set_variable()` reported
 success on every call — no error, `errors 0`, `writes 1` — and changed nothing:
@@ -37,6 +39,20 @@ been inferred from `variable_exists` — a read-only call.
 24 samples, one level, spread 0.0000, both viewport accessors agreeing exactly. No
 competing writer exists, so no arbitration is needed.
 
+**`shadow_freeze.log`** is why the freeze works in parent space. The pre-fix build
+logged `captured shadow direction at yaw 0.00` while the sky was already turned. The
+fixed build logs both spaces:
+
+```
+[2026-10-25 17:10:13] captured shadow direction at yaw -180.00 (parent yaw 180.00, local yaw 0.00)
+[2026-10-25 17:12:48] captured shadow direction at yaw 63.89 (parent yaw 63.89, local yaw 0.00)
+```
+
+The parent yaw is the value that moves; the light's local yaw stays zero. That is the
+measurement behind "linked `Light:rotation()` returns local rotation". The user then
+confirmed in-game that the shadow stays fixed while the sky rotates. The `toggle=on`
+fields predate removing the toggle; the shipped module is always on and has no tab.
+
 ## A note on the brightness log
 
 It contains 112 identical lines timestamped `14:09:47` — the result of dragging the
@@ -48,5 +64,6 @@ exists.
 ## Provenance
 
 All produced 2026-10-15 on the user's install, written to `mods/saves/` by the probe
-modules. The probe modules themselves have since been deleted from the mod; these files
-are the remaining record of what they measured.
+modules. The shadow-freeze log was produced 2026-10-25. The probe modules themselves
+have since been deleted from the shipped mod; copies are archived in `probes/` as the
+remaining record of what they measured. They are evidence code, not supported tools.

@@ -1,6 +1,7 @@
 # PAYDAY 2 Skybox / Material Config — Investigation Report
 
 **Date:** 2026-10-15
+**Updated:** 2026-10-25 — shadow freeze verified in-game
 **Subject:** Can a PAYDAY 2 skybox be animated, and what drives it?
 **Short answer:** Yes, two independent ways. **Dome rotation is directly drivable from
 Lua** (`_env_handler:editor_set_value`), and whole-environment swap re-grades the sky.
@@ -209,6 +210,42 @@ measured a spread of **0.0000** — completely static, with both viewports agree
 file evidence agrees: `sky_rot` appears in only four files in the whole export, all
 editor or lobby Lua, and the modifier is created once at level load. A mod can
 therefore own the rotation outright, with nothing to arbitrate against.
+
+#### The shadow follows the dome — and can be held still (verified in-game)
+
+Rotating `rp_skydome` also rotates the sun, and therefore the shadow. The global
+directional light is linked to `d_sun`, a child of `rp_skydome`:
+
+```lua
+Global._global_light = World:create_light("directional|specular")
+Global._global_light:link(Underlay:get_object(Idstring("d_sun")))
+World:set_global_shadow_caster(Global._global_light)
+```
+
+The obvious fix — capture the light's rotation and write it back with
+`Light:set_rotation()` — darkened the level. On a linked light, `Light:rotation()`
+returns its **local** rotation, not its world rotation. The live capture recorded
+`local yaw 0.00` while the parent was at `63.89`; writing that back as world pointed
+the sun away.
+
+The correct lever is the parent link:
+
+```lua
+local world = parent:rotation() * light:local_rotation()
+light:set_local_rotation(parent:rotation():inverse() * world)
+```
+
+Immediately after capture the formula returns the light's existing local rotation, so
+nothing moves. Once the parent turns, the same formula cancels the parent's new world
+rotation, so `parent * local` stays at the captured angle. The visible sun still moves
+with the cubemap; only the cast shadow stays fixed.
+
+`shadow_freeze.lua` does this automatically, with **no menu tab or toggle**: it is on
+whenever the sky rotation driver is running, recaptures when the engine replaces the
+light or a level loads, and leaves an unlinked light alone. The user confirmed in-game
+on 2026-10-25 that the shadow stays put while the sky turns. The raw lines are in
+`evidence/shadow_freeze.log`; the early `yaw 0.00` entries are the pre-fix build, and
+the later `(parent yaw …, local yaw 0.00)` entries are the fix.
 
 ### 2. Environment swap — re-grades the whole sky
 
